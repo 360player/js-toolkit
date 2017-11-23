@@ -1,13 +1,24 @@
 {
- "private": true,
- "name": "js-toolkit",
- "version": "0.1.0",
- "description": "Common utility functions for modern JavaScript development.",
- "main": "index.js",
- "author": "Robin Grass <robin@360player.com>",
- "license": "MIT",
- "devDependencies": {
-  "flow-bin": "^0.59.0",
-  "jest": "^21.2.1"
- }
+	"private": true,
+	"name": "js-toolkit",
+	"version": "0.1.0",
+	"description": "Common utility functions for modern JavaScript development.",
+	"main": "index.js",
+	"author": "Robin Grass <robin@360player.com>",
+	"license": "MIT",
+	"scripts": {
+		"lint": "./node_modules/.bin/flow check && ./node_modules/.bin/eslint .",
+		"test": "./node_modules/.bin/jest"
+	},
+	"devDependencies": {
+		"eslint": "^4.11.0",
+		"flow-bin": "^0.59.0",
+		"jest": "^21.2.1"
+	},
+	"jest": {
+		"testRegex": "/.*\\.js$",
+		"roots": [
+			"./spec"
+		]
+	}
 }
