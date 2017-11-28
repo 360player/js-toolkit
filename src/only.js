@@ -1,15 +1,19 @@
 /* @flow */
 
+/* @type-dependencies */
+import type { MixedObjectType } from './omit';
+
 /**
  *	Creates a copy of source object and returns a filtered object with only keep keys.
  *
  *	@param object sourceObject
  *	@param string, ... keepKeys
  *
- *	@return object
+ *	@return MixedObjectType
  */
-export default function only( sourceObject : Object, ...keepKeys : Array<string> ) : Object {
-	let filteredObject : Object = {};
+export default function only( sourceObject : MixedObjectType, ...keepKeys : Array<string> ) : MixedObjectType {
+	let filteredObject : MixedObjectType = {};
+	let keepKey : string;
 
 	keepKeys.forEach( keepKey => {
 		const keyExists : boolean = ( Object.keys( sourceObject ).indexOf( keepKey ) > -1 );
@@ -19,5 +23,5 @@ export default function only( sourceObject : Object, ...keepKeys : Array<string>
 		}
 	});
 
-	return filteredObject
+	return filteredObject;
 }

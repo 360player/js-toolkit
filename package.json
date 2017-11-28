@@ -7,8 +7,10 @@
 	"author": "Robin Grass <robin@360player.com>",
 	"license": "MIT",
 	"scripts": {
-		"lint": "./node_modules/.bin/eslint . && ./node_modules/.bin/flow check",
-		"test": "./node_modules/.bin/jest"
+		"lint": "./node_modules/.bin/eslint .",
+		"flow": "./node_modules/.bin/flow check",
+		"test": "./node_modules/.bin/jest",
+		"code-quality": "yarn run lint && yarn run flow && yarn run test"
 	},
 	"devDependencies": {
 		"babel-eslint": "^8.0.2",

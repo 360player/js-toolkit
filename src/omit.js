@@ -1,17 +1,22 @@
 /* @flow */
 
 /**
+ *	@type MixedObjectType
+ */
+export type MixedObjectType = { [ key : string ] : mixed };
+
+/**
  *	Creates a copy of source object and returns a filtered object without omit keys.
  *
  *	@param object sourceObject
  *	@param string, ... omitKeys
  *
- *	@return object
+ *	@return MixedObject
  */
-export default function omit( sourceObject : Object, ...omitKeys : Array<string> ) : Object {
-	let filteredObject : Object = Object.assign( {}, sourceObject );
+export default function omit( sourceObject : MixedObjectType, ...omitKeys : Array<string> ) : MixedObjectType {
+	let filteredObject : MixedObjectType = Object.assign( {}, sourceObject );
 
-	omitKeys.forEach( omitKey => {
+	omitKeys.forEach( ( omitKey : string ) => {
 		const omitKeyExists : boolean = ( Object.keys( sourceObject ).indexOf( omitKey ) > -1 );
 
 		if ( omitKeyExists === true ) {
@@ -19,5 +24,5 @@ export default function omit( sourceObject : Object, ...omitKeys : Array<string>
 		}
 	});
 
-	return filteredObject
+	return filteredObject;
 }

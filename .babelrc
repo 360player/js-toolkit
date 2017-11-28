@@ -1,14 +1,14 @@
 {
-  "presets": [
-    "es2015"
-  ],
-  "plugins": [
-    "transform-flow-strip-types",
-    [
-      "transform-runtime", {
-        "polyfill": false,
-        "regenerator": true
-      }
-    ]
-  ]
+	"presets": [
+		"es2015"
+	],
+	"plugins": [
+		"transform-flow-strip-types",
+		[
+			"transform-runtime", {
+				"polyfill": false,
+				"regenerator": true
+			}
+		]
+	]
 }
