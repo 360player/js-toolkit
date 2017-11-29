@@ -2,6 +2,7 @@
 
 /* @dependencies */
 import omit from './omit';
+import serialize from './serialize';
 
 /* @type-dependencies */
 import type { MixedObjectType } from './generics';
@@ -17,30 +18,6 @@ export function cleanUriPath( unresolvedUrl : string ) : string {
 	return unresolvedUrl
 		.replace( /\/+/g, '/' )
 		.replace( /\/+$/, '' );
-}
-
-/**
- *	Serializes object into string
- *
- *	@param MixedObjectType unresolvedObjet
- *
- *	@return string
- */
-export function serializeParameters( unresolvedObject : MixedObjectType ) : string {
-	let parameterSegments : Array<string> = [];
-
-	for( const [ key, value ] of Object.entries( unresolvedObject ) ) {
-		if ( key !== null ) {
-			const encodedKey : string = encodeURIComponent( key );
-
-			// @FLOWFIXME https://github.com/facebook/flow/issues/2221
-			const encodedValue : string = encodeURIComponent( value );
-
-			parameterSegments.push( `${encodedKey}=${encodedValue}` );
-		}
-	}
-
-	return parameterSegments.join( '&' );
 }
 
 /**
@@ -67,7 +44,7 @@ export function transformUrlParameters( parameterizedUrl : string, replacementMa
 
 	const transformedUrl : string = cleanUriPath( parameterizedUrl ).replace( lookupPattern, replaceMatch );
 
-	const queryString : string = serializeParameters( omit( replacementMap, ...omitKeys ) );
+	const queryString : string = serialize( omit( replacementMap, ...omitKeys ) );
 	const urlSuffix : string = ( queryString.length > 0 ) ? `?${queryString}` : '';
 
 	return transformedUrl + urlSuffix;

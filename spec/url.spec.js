@@ -1,7 +1,6 @@
 /* @dependencies */
 import {
 	cleanUriPath,
-	serializeParameters,
 	transformUrlParameters
 } from '../src/url';
 
@@ -11,20 +10,6 @@ describe('cleanUriPath', () => {
 		const filtered = cleanUriPath( '//users//' );
 
 		expect( filtered ).toEqual( expected );
-	});
-});
-
-describe('serializeParameters', () => {
-	it('serializes an object into a serialized string', () => {
-		const expected = 'foo=Hello&bar=World&isAwesome=true&meaningOfLife=42';
-		const serialized = serializeParameters({
-			foo: 'Hello',
-			bar: 'World',
-			isAwesome: true,
-			meaningOfLife: 42
-		});
-
-		expect( serialized ).toEqual( expected );
 	});
 });
 
