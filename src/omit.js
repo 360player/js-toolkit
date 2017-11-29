@@ -1,9 +1,7 @@
 /* @flow */
 
-/**
- *	@type MixedObjectType
- */
-export type MixedObjectType = { [ key : string ] : mixed };
+/* @type-dependencies */
+import type { MixedObjectType } from './generics';
 
 /**
  *	Creates a copy of source object and returns a filtered object without omit keys.

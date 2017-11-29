@@ -1,7 +1,7 @@
 /* @flow */
 
 /* @type-dependencies */
-import type { MixedObjectType } from './omit';
+import type { MixedObjectType } from './generics';
 
 /**
  *	Creates a copy of source object and returns a filtered object with only keep keys.

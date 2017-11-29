@@ -4,7 +4,7 @@
 import omit from './omit';
 
 /* @type-dependencies */
-import type { MixedObjectType } from './omit';
+import type { MixedObjectType } from './generics';
 
 /**
  *	Removes redundant slashes from URI path.
