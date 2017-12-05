@@ -1,8 +1,8 @@
 /* @dependencies */
 import unserialize from '../src/unserialize';
 
-describe('unserialize.js', () => {
-	it('unserializes a string into an object', () => {
+describe('unserialize', () => {
+	it('unserializes a string into object', () => {
 		const expected = {
 			foo: 'Hello',
 			bar: 'World',
