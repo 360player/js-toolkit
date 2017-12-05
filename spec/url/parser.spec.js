@@ -31,7 +31,7 @@ describe('Parser', () => {
 
 	it('parses match results', () => {
 		const expected = {
-			matches : true,
+			match : true,
 			params: {
 				userId: 42
 			},
@@ -40,9 +40,9 @@ describe('Parser', () => {
 			pattern: '/users/:userId'
 		};
 
-		const parsed = parser.parse( '/users/:userId', '/users/42?metaOnly=true' );
+		const parsed = parser.parse( '/users/:userId', '/users/42' );
 
-		//expect( parsed ).toEqual( expected );
+		expect( parsed ).toEqual( expected );
 	});
 
 });

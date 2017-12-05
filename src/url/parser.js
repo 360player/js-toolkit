@@ -82,63 +82,13 @@ export default class Parser {
 	}
 
 	/**
-	 *	Parses path from input URI.
+	 *	Transforms URI path and populates parameters in that path.
 	 *
 	 *	@param string uriPattern
-	 *	@param string uriPath
+	 *	@param ParserParamsType uriParams
 	 *
-	 *	@return ParserMatchType
+	 *	@return string
 	 */
-	/*match( uriPattern : string, uriPath : string ) : ParserMatchType {
-		const pattern : RegExp = this.getPatternRegExp( uriPattern );
-		const parameterNames : null | ?Array<string> = uriPattern.match( REGEX_LOOKUP_PATTERN );
-
-		const params = {};
-		let path : string = '';
-		let query : ParserParamsType = {};
-
-		const regexMatches = uriPath.match( REGEX_LOOKUP_QUERY );
-
-		if ( regexMatches ) {
-			// @FLOWFIXME Fix for destructive assignment
-			regexMatches.push('', '');
-			// @FLOWFIXME Flow throws "possibly undefined", which is not reached (see line above)
-			let [ path, query ] = regexMatches;
-		}
-
-		if ( typeof query === 'string' ) {
-			query = unserialize( query );
-		}
-
-		path = path.replace( '?', '' );
-
-		let matches : null | ?Array<string> = path.match( pattern );
-
-		if ( matches ) {
-			// @FLOWFIXME Flow throws "possibly undefined", which is not reached (see line above)
-			let actualMatches : Array<string> = matches.slice( 1 );
-
-			if ( actualMatches && parameterNames ) {
-				// @FLOWFIXME Flow throws "possibly undefined", which is not reached (see line above)
-				parameterNames.forEach(( parameter, n ) => {
-					// @FLOWFIXME https://github.com/facebook/flow/issues/2221
-					let value = unserializeValue( matches[ n ] );
-					params[ parameter.replace( ':', '' ) ] = value;
-				});
-			}
-		}
-
-		let matchResults : ParserMatchType = {
-			match : ( matches !== null ),
-			pattern : uriPattern,
-			path,
-			params,
-			query
-		};
-
-		return matchResults;
-	}*/
-
 	transform( uriPattern : string, uriParams : ParserParamsType = {} ) : string {
 		let omitKeys : Array<string> = [];
 
@@ -159,6 +109,14 @@ export default class Parser {
 		return transformedUrl + urlSuffix;
 	}
 
+	/**
+	 *	Parses URI using URI pattern.
+	 *
+	 *	@param string uriPattern
+	 *	@param string uriPath
+	 *
+	 *	@return ParserResultType
+	 */
 	parse( uriPattern : string, uriPath : string ) : ParserResultType {
 		const uriPatternRegex : RegExp = this.getPatternRegExp( uriPattern );
 		const parameterMatches : ?Array<string> = uriPattern.match( REGEX_LOOKUP_PATTERN );
@@ -173,8 +131,12 @@ export default class Parser {
 		};
 
 		if ( uriMatches !== null && uriMatches !== undefined ) {
-			if ( uriMatches.length === 1 ) {
-				uriMatches.push( '' );
+			if ( uriMatches.length > 0 ) {
+				parserResult.match = true;
+			}
+
+			if ( uriMatches.length <= 1 ) {
+				uriMatches.push( '', '' );
 			}
 
 			const [ parsedUriPath, parsedUriQuery ] = uriMatches.map( match => match.replace( '?', '' ));
@@ -211,8 +173,6 @@ export default class Parser {
 				}
 			}
 		}
-
-		console.log( parserResult );
 
 		return parserResult;
 	}
