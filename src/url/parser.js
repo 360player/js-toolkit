@@ -131,10 +131,6 @@ export default class Parser {
 		};
 
 		if ( uriMatches !== null && uriMatches !== undefined ) {
-			if ( uriMatches.length > 0 ) {
-				parserResult.match = true;
-			}
-
 			if ( uriMatches.length <= 1 ) {
 				uriMatches.push( '', '' );
 			}
@@ -154,6 +150,8 @@ export default class Parser {
 			}
 
 			if ( parsedUriMatches !== null && parsedUriMatches !== undefined ) {
+				parserResult.match = true;
+
 				// @NOTE Filter out any non strings and remove full match from result
 				const filteredMatches : Array<string> = parsedUriMatches
 					.filter( match => ( typeof match === 'string') )

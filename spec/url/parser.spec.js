@@ -45,4 +45,18 @@ describe('Parser', () => {
 		expect( parsed ).toEqual( expected );
 	});
 
+	it('parses but does not match', () => {
+		const expected = {
+			match : false,
+			params: {},
+			query: {},
+			path: '/users/42/friends',
+			pattern: '/users/:userId'
+		};
+
+		const parsed = parser.parse( '/users/:userId', '/users/42/friends' );
+
+		expect( parsed ).toEqual( expected );
+	});
+
 });
