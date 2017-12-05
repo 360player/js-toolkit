@@ -13,7 +13,7 @@ yarn add https://github.com/360player/js-toolkit.git --save
 
 ## Using
 
-Since this project isn't a traditional "_node module_" and uncompiled, you have to resolve paths (_recommended!_), or include directly from `node_modules`.
+Since this project isn't a traditional "_node module_" and uncompiled, you have to resolve paths (_recommended_), or include directly from `node_modules`.
 
 ## Development
 
