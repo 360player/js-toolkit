@@ -1,6 +1,14 @@
 /* @flow */
 
-export default function levenshtein( a : string, b : string ) : mixed {
+/**
+ *	Calculates Levenshtein distance of two strings.
+ *
+ *	@param string a
+ *	@param string b
+ *
+ *	@return number
+ */
+export default function levenshtein( a : string, b : string ) : number {
 	if ( a.length === 0 ) return b.length;
 	if ( b.length === 0 ) return a.length;
 
@@ -39,5 +47,5 @@ export default function levenshtein( a : string, b : string ) : mixed {
 		row[ al ] = prev;
 	}
 
-	return row[ al ];
+	return parseInt( row[ al ] );
 }
