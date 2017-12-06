@@ -1,5 +1,5 @@
 /* @dependencies */
-import filterList from '../src/filterList';
+import filterList from '../src/filterlist';
 
 const weekDays = [ 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday' ];
 
