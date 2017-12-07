@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>360Player / js-toolkit</title>
+		<style type="text/css">
+			body, html {
+				height: 100%;
+			}
+
+			*, * {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+
+			header {
+				background: linear-gradient( 155deg, #dee2e8 50%, #fff 100%);
+				overflow: hidden;
+				height: 100%;
+				position: relative;
+			}
+
+			header:before {
+				content: '';
+				display: block;
+				position: absolute;
+				left: -50vw;
+				top: -50vw;
+				width: 100vw;
+				height: 100vw;
+				background: linear-gradient( 155deg, #dee2e8 50%, #fff 100%);
+				transform: rotate(45deg);
+			}
+
+			article {
+				position: relative;
+				z-index: 1000;
+				width: 100%;
+				text-align: center;
+				display: block;
+			}
+
+			article svg {
+				margin: 50px auto;
+				width: 80%;
+				max-width: 320px;
+				display: block;
+
+				-webkit-filter: drop-shadow( #679F42 0 5px 20px );
+				filter: drop-shadow( #679F42 0 5px 20px );
+			}
+
+			h1, h3, p {
+				margin-bottom: 25px;
+				font: 300 32px "Roboto Mono", monospace;
+			}
+
+			h1 {
+				color: #679F42;
+			}
+
+			h3, p {
+				font-weight: 400;
+				font-size: 16px;
+				color: #333;
+			}
+
+			a {
+				margin-top: 25px;
+				padding: 10px 25px;
+				padding-bottom: 12px;
+				border-radius: 1000px;
+				background: #679F42;
+				display: inline-block;
+				text-decoration: none;
+				font-weight: 700;
+				color: #DCECC8;
+				box-shadow: #679F42 0 5px 20px;
+			}
+		</style>
+		<link href="https://fonts.googleapis.com/css?family=Roboto+Mono:300,400,700" rel="stylesheet" />
+	</head>
+	<body>
+		<header>
+			<article>
+				<svg version="1.1" id="Logotype" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve">
+					<g id="Logotype">
+						<path fill="#679F42" stroke="#679F42" stroke-width="3" stroke-miterlimit="10" d="M50.1,97.3c-1.1,0-2.2-0.2-3-0.7L11.2,75.9 c-1.6-0.9-3-3.3-3-5.1V29.2c0-1.8,1.4-4.2,3-5.1L47.1,3.3c0.8-0.4,1.8-0.7,3-0.7s2.2,0.2,3,0.7L89,24.1c1.6,0.9,3,3.3,3,5.1v41.5 c0,1.8-1.4,4.2-3,5.1L53.1,96.7C52.3,97.1,51.2,97.3,50.1,97.3z" />
+						<g id="Wrench_Alt">
+							<line fill="none" stroke="#DCECC8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="51.5" y1="47.8" x2="29.6" y2="69.6" />
+							<path fill="none" stroke="#DCECC8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" d="M70.6,39.8c0,6.2-5,11.2-11.2,11.2s-11.2-5-11.2-11.2s5-11.2,11.2-11.2" />
+						</g>
+					</g>
+				</svg>
+				<h1>JavaScript Toolkit</h1>
+				<h3>Common utility functions for modern JavaScript development.</h3>
+				<p><a href="https://github.com/360player/js-toolkit">View on GitHub</a></p>
+			</article>
+		</header>
+	</body>
+</html>
