@@ -14,9 +14,11 @@ yarn add https://github.com/360player/js-toolkit.git --save
 
 ## Using
 
-Since this project isn't a traditional "_node module_" and uncompiled, you have to resolve paths (_recommended_), or include directly from `node_modules`.
-
-You decide yourself how to build and/or bundle your application, something that is outside `js-toolkit`'s scope.
+```javascript
+import omit from 'js-toolkit/omit';
+// Omits properties from payload object
+let payload = omit( formData, 'password_repeat' );
+```
 
 ## Development
 
@@ -24,10 +26,6 @@ You decide yourself how to build and/or bundle your application, something that 
 
 Code *MUST* be linted with [ESLint](https://eslint.org/), typechecked with [Flow](https://flowtype.org/) and tested with [Jest](https://facebook.github.io/jest/).
 You can run each section individually via `yarn run lint`, `yarn run flow` or `yarn run test`. Or run them all in order via `yarn run code-quality`
-
-### Philosophy
-
-`js-toolkit` applies a "Pure ES7, No Polyfill" (PENP) approach to it's code.
 
 ## Contributing
 
