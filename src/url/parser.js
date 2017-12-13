@@ -12,7 +12,7 @@ import type { MixedObjectType } from '../generics';
 /**
  *	@type ParserParamsType
  */
-type ParserParamsType = { [ key : string ] : mixed };
+export type ParserParamsType = { [ key : string ] : mixed };
 
 /**
  *	@type ParserMatchType
