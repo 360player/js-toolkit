@@ -1,5 +1,4 @@
-# ![js-toolkit-logo](https://rawgit.com/360player/js-toolkit/master/js-toolkit--small.svg) JavaScript Toolkit
-[![Build Status](https://img.shields.io/travis/360player/js-toolkit.svg?style=flat)](https://travis-ci.org/360player/js-toolkit) [![devDependency Status](https://david-dm.org/360player/js-toolkit/dev-status.svg)](https://david-dm.org/360player/js-toolkit#info=devDependencies)
+# ![js-toolkit-logo](https://rawgit.com/360player/js-toolkit/master/js-toolkit--small.svg) JavaScript Toolkit [![Build Status](https://img.shields.io/travis/360player/js-toolkit.svg?style=flat)](https://travis-ci.org/360player/js-toolkit) [![devDependency Status](https://david-dm.org/360player/js-toolkit/dev-status.svg)](https://david-dm.org/360player/js-toolkit#info=devDependencies) [![Coverage Status](https://coveralls.io/repos/github/360player/js-toolkit/badge.svg?branch=master)](https://coveralls.io/github/360player/js-toolkit?branch=master)
 
 ### Common utility functions for modern JavaScript development.
 
