@@ -1,9 +1,3 @@
-<p align="right">
-	<a href="https://360player.github.io/js-toolkit/">
-		<img src="https://rawgit.com/360player/js-toolkit/master/js-toolkit__logotype.svg" width="150" height="150" alt="360Player JavaScript Toolkit" />
-	</a>
-</p>
-
 # JavaScript Toolkit
 
 [![Build Status][build-status-badge]][build-status-url]
