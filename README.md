@@ -1,5 +1,5 @@
 <p align="center">
-	<img src="https://rawgit.com/360player/js-sdk/new-api/js-toolkit__logotype.svg" width="150" height="150" alt="360Player JavaScript SDK" />
+	<img src="https://rawgit.com/360player/js-toolkit/master/js-toolkit__logotype.svg" width="150" height="150" alt="360Player JavaScript Toolkit" />
 </p>
 
 [![Build Status][build-status-badge]][build-status-url]
@@ -39,7 +39,7 @@ You can run each section individually via `yarn run lint`, `yarn run flow` or `y
 
 [build-status-badge]: https://img.shields.io/travis/360player/js-sdk.svg?style=flat
 [build-status-url]: https://travis-ci.org/360player/js-sdk
-[coverage-status-badge]: ttps://coveralls.io/repos/github/360player/js-toolkit/badge.svg?branch=master
+[coverage-status-badge]: https://coveralls.io/repos/github/360player/js-toolkit/badge.svg?branch=master
 [coverage-status-url]: https://coveralls.io/github/360player/js-toolkit?branch=master
 [dependency-status-badge]: https://david-dm.org/360player/js-sdk/dev-status.svg
 [dependency-status-url]: https://david-dm.org/360player/js-sdk#info=devDependencies
