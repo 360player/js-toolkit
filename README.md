@@ -1,12 +1,12 @@
-<p align="center">
+<p align="right">
 	<img src="https://rawgit.com/360player/js-toolkit/master/js-toolkit__logotype.svg" width="150" height="150" alt="360Player JavaScript Toolkit" />
 </p>
+
+# JavaScript Toolkit
 
 [![Build Status][build-status-badge]][build-status-url]
 [![Coverage Status][coverage-status-badge]][coverage-status-url]
 [![Dependency Status][dependency-status-badge]][dependency-status-url]
-
-# JavaScript Toolkit
 
 ### Common utility functions for modern JavaScript development.
 
