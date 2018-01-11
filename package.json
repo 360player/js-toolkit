@@ -1,7 +1,7 @@
 {
 	"private": true,
 	"name": "js-toolkit",
-	"version": "0.1.13",
+	"version": "0.1.15",
 	"description": "Common utility functions for modern JavaScript development.",
 	"main": "./src/index.js",
 	"author": "Robin Grass <robin@360player.com>",
@@ -18,12 +18,13 @@
 		"code-quality": "yarn run lint && yarn run flow && yarn run test",
 		"compile": "./node_modules/.bin/babel -d . src/ && git add .",
 		"bump-version": "npm --no-git-tag-version version patch && git add package.json",
-		"generate-docs": "./node_modules/.bin/babel-node ./generate-docs.js"
+		"generate-docs": "./node_modules/.bin/babel-node ./generate-docs.js && git add docs/index.html"
 	},
 	"pre-commit": [
 		"code-quality",
 		"compile",
-		"bump-version"
+		"bump-version",
+		"generate-docs"
 	],
 	"devDependencies": {
 		"babel-cli": "^6.26.0",
