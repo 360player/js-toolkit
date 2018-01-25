@@ -142,7 +142,7 @@ var Parser = function () {
 			var queryString = (0, _serialize2.default)(_omit2.default.apply(undefined, [uriParams].concat(omitKeys)));
 			var urlSuffix = queryString.length > 0 ? '?' + queryString : '';
 
-			return transformedUrl + urlSuffix;
+			return this.clean(transformedUrl + urlSuffix);
 		}
 
 		/**

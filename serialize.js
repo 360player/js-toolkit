@@ -32,9 +32,11 @@ function serialize(unresolvedObject) {
 			    key = _step$value[0],
 			    value = _step$value[1];
 
-			if (key !== null) {
-				var encodedKey = encodeURIComponent(key);
+			var encodedKey = encodeURIComponent(key);
 
+			if (value === null) {
+				parameterSegments.push(encodedKey);
+			} else {
 				// @FLOWFIXME https://github.com/facebook/flow/issues/2221
 				var encodedValue = encodeURIComponent(value);
 

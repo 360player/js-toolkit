@@ -13,4 +13,14 @@ describe('serialize', () => {
 
 		expect( serialized ).toEqual( expected );
 	});
+
+	it('serializes object without values', () => {
+		const expected = 'foo=Hello&bar';
+		const serialized = serialize({
+			foo: 'Hello',
+			bar: null
+		});
+
+		expect( serialized ).toEqual( expected );
+	});
 });

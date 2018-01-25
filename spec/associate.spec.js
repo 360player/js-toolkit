@@ -8,4 +8,12 @@ describe('associate', () => {
 
 		expect( associated ).toEqual( expected );
 	});
+
+	it('throws error when array lengths mismatches', () => {
+		const shouldThrowError = () => {
+			const associated = associate( [ 'a', 'b' ], [ 'a', 'b', 'c' ] );
+		};
+
+		expect( shouldThrowError ).toThrow();
+	});
 });

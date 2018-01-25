@@ -15,10 +15,6 @@ export function unserializeValue( unresolvedValue : string ) : mixed {
 
 	if ( unresolvedValue === 'false' ) return false;
 
-	if ( unresolvedValue === 'null' ) return null;
-
-	if ( unresolvedValue === 'undefined' ) return undefined;
-
 	if ( isNaN( unresolvedValue ) === false ) {
 		return parseFloat( unresolvedValue );
 	}

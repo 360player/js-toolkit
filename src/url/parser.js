@@ -106,7 +106,7 @@ export default class Parser {
 		const queryString : string = serialize( omit( uriParams, ...omitKeys ) );
 		const urlSuffix : string = ( queryString.length > 0 ) ? `?${queryString}` : '';
 
-		return transformedUrl + urlSuffix;
+		return this.clean( transformedUrl + urlSuffix );
 	}
 
 	/**

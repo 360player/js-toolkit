@@ -30,7 +30,7 @@ describe('WeakStorage', () => {
 	});
 
 
-	it('has increases length', () => {
+	it('increases length when adding items', () => {
 		const initialLength = weakStorage.length;
 
 		weakStorage.setItem( 'greet', 'Hejsan!' );

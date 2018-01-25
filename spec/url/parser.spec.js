@@ -19,6 +19,13 @@ describe('Parser', () => {
 		expect( transformed ).toEqual( expected );
 	});
 
+	it('does not transform empty params', () => {
+		const expected = '/users';
+		const transformed = parser.transform( '/users/:userId' );
+
+		expect( transformed ).toEqual( expected );
+	});
+
 	it('appends querystring if replacement map contains unused parameters', () => {
 		const expected = '/users/42/friends?sortBy=email%3ADESC';
 		const transformed = parser.transform( '/users/:userId/friends', {
@@ -27,6 +34,24 @@ describe('Parser', () => {
 		} );
 
 		expect( transformed ).toEqual( expected );
+	});
+
+	it('parses query string', () => {
+		const expected = {
+			match : true,
+			params: {
+				userId: 42
+			},
+			query: {
+				includeMeta : true
+			},
+			path: '/users/42',
+			pattern: '/users/:userId'
+		};
+
+		const parsed = parser.parse( '/users/:userId', '/users/42?includeMeta=true' );
+
+		expect( parsed ).toEqual( expected );
 	});
 
 	it('parses match results', () => {

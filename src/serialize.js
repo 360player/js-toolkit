@@ -14,9 +14,11 @@ export default function serialize( unresolvedObject : MixedObjectType ) : string
 	let parameterSegments : Array<string> = [];
 
 	for( const [ key, value ] of Object.entries( unresolvedObject ) ) {
-		if ( key !== null ) {
-			const encodedKey : string = encodeURIComponent( key );
+		const encodedKey : string = encodeURIComponent( key );
 
+		if ( value === null ) {
+			parameterSegments.push( encodedKey );
+		} else {
 			// @FLOWFIXME https://github.com/facebook/flow/issues/2221
 			const encodedValue : string = encodeURIComponent( value );
 
