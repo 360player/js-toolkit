@@ -34,8 +34,8 @@ You can run each section individually via `yarn run lint`, `yarn run flow` or `y
 - Every new feature, function or class **CANNOT** have any polyfills and **MUST** be ES7 compliant.
 
 [build-status-badge]: https://travis-ci.org/360player/js-toolkit.svg?branch=master
-[build-status-url]: https://travis-ci.org/360player/js-sdk
+[build-status-url]: https://travis-ci.org/360player/js-toolkit
 [coverage-status-badge]: https://coveralls.io/repos/github/360player/js-toolkit/badge.svg?branch=master
 [coverage-status-url]: https://coveralls.io/github/360player/js-toolkit?branch=master
-[dependency-status-badge]: https://david-dm.org/360player/js-sdk/dev-status.svg
-[dependency-status-url]: https://david-dm.org/360player/js-sdk#info=devDependencies
+[dependency-status-badge]: https://david-dm.org/360player/js-toolkit/dev-status.svg
+[dependency-status-url]: https://david-dm.org/360player/js-toolkit#info=devDependencies
