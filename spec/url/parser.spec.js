@@ -84,4 +84,14 @@ describe('Parser', () => {
 		expect( parsed ).toEqual( expected );
 	});
 
+	it('transforms even if querystring is already present', () => {
+		const initialUri = '/users/:userId/friends?sortBy=firstName:ASC';
+		const expected = '/users/1337/friends?sortBy=email%3ADESC';
+		const transformed = parser.transform( initialUri, {
+			userId: 1337,
+			sortBy: 'email:DESC'
+		} );
+
+		expect( transformed ).toEqual( expected );
+	});
 });

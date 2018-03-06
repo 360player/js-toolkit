@@ -138,8 +138,20 @@ var Parser = function () {
 				return '';
 			};
 
+			var queryString = void 0;
+			var queryParams = {};
+			var queryPosition = uriPattern.indexOf('?');
+			var hasQueryInPattern = queryPosition > -1;
+
+			if (hasQueryInPattern) {
+				queryString = uriPattern.substring(queryPosition + 1);
+				uriPattern = uriPattern.substring(0, queryPosition);
+
+				queryParams = (0, _unserialize2.default)(queryString);
+			}
+
 			var transformedUrl = this.clean(uriPattern).replace(REGEX_REPLACE_PATTERN, replaceMatch);
-			var queryString = (0, _serialize2.default)(_omit2.default.apply(undefined, [uriParams].concat(omitKeys)));
+			queryString = (0, _serialize2.default)(Object.assign({}, queryParams, _omit2.default.apply(undefined, [uriParams].concat(omitKeys))));
 			var urlSuffix = queryString.length > 0 ? '?' + queryString : '';
 
 			return this.clean(transformedUrl + urlSuffix);

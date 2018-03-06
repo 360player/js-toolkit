@@ -102,8 +102,20 @@ export default class Parser {
 			return '';
 		};
 
+		let queryString : string;
+		let queryParams : MixedObjectType = {};
+		const queryPosition : number = uriPattern.indexOf( '?' );
+		const hasQueryInPattern : boolean = ( queryPosition > -1 );
+
+		if ( hasQueryInPattern ) {
+			queryString = uriPattern.substring( queryPosition + 1 );
+			uriPattern = uriPattern.substring( 0, queryPosition );
+
+			queryParams = unserialize( queryString );
+		}
+
 		const transformedUrl : string = this.clean( uriPattern ).replace( REGEX_REPLACE_PATTERN, replaceMatch );
-		const queryString : string = serialize( omit( uriParams, ...omitKeys ) );
+		queryString = serialize( Object.assign( {}, queryParams, omit( uriParams, ...omitKeys ) ) );
 		const urlSuffix : string = ( queryString.length > 0 ) ? `?${queryString}` : '';
 
 		return this.clean( transformedUrl + urlSuffix );
