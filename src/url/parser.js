@@ -72,11 +72,15 @@ export default class Parser {
 	 *	@return RegExp
 	 */
 	getPatternRegExp( uriPattern : string ) : RegExp {
-		const pattern : string = this.clean( `/${uriPattern}` )
+		let pattern : string = this.clean( `/${uriPattern}` )
 			.replace( /[-\/\\^$*+?.()|[\]{}]/g, '\\$&' )
 			.replace( REGEX_LOOKUP_PATTERN, match => {
 				return REGEX_LOOKUP_CAPTURE;
 			});
+
+		if ( pattern.length === 0 ) {
+			pattern = '\\/';
+		}
 
 		return new RegExp( `^${pattern}$`, 'i' );
 	}
@@ -130,6 +134,12 @@ export default class Parser {
 	 *	@return ParserResultType
 	 */
 	parse( uriPattern : string, uriPath : string ) : ParserResultType {
+		uriPath = this.clean( uriPath );
+
+		if ( uriPath.length === 0 ) {
+			uriPath += '/';
+		}
+
 		const uriPatternRegex : RegExp = this.getPatternRegExp( uriPattern );
 		const parameterMatches : ?Array<string> = uriPattern.match( REGEX_LOOKUP_PATTERN );
 		const uriMatches : ?Array<string> = uriPath.match( REGEX_LOOKUP_QUERY );

@@ -94,4 +94,33 @@ describe('Parser', () => {
 
 		expect( transformed ).toEqual( expected );
 	});
+
+	it('matches root pattern', () => {
+		const expected = {
+			match : true,
+			params: {},
+			query: {},
+			path: '/',
+			pattern: '/',
+		};
+
+		const parersed = parser.parse( '/', '/' );
+
+		expect( parersed ).toEqual( expected );
+	});
+
+
+	it('matches root pattern with excessive slashes', () => {
+		const expected = {
+			match : true,
+			params: {},
+			query: {},
+			path: '/',
+			pattern: '/',
+		};
+
+		const parersed = parser.parse( '/', '/////////////' );
+
+		expect( parersed ).toEqual( expected );
+	});
 });

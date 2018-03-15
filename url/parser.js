@@ -109,6 +109,10 @@ var Parser = function () {
 				return REGEX_LOOKUP_CAPTURE;
 			});
 
+			if (pattern.length === 0) {
+				pattern = '\\/';
+			}
+
 			return new RegExp('^' + pattern + '$', 'i');
 		}
 
@@ -169,6 +173,12 @@ var Parser = function () {
 	}, {
 		key: 'parse',
 		value: function parse(uriPattern, uriPath) {
+			uriPath = this.clean(uriPath);
+
+			if (uriPath.length === 0) {
+				uriPath += '/';
+			}
+
 			var uriPatternRegex = this.getPatternRegExp(uriPattern);
 			var parameterMatches = uriPattern.match(REGEX_LOOKUP_PATTERN);
 			var uriMatches = uriPath.match(REGEX_LOOKUP_QUERY);
