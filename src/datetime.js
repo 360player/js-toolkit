@@ -556,12 +556,26 @@ export default class DateTime {
 	 *	@return boolean
 	 */
 	isToday( dateTime : Date ) : boolean {
-		dateTime = ( new DateTime(dateTime) ).setTime( 12, 0, 0, 0 ).getDateTime();
+		let adjustedDateTime = ( new DateTime( dateTime ) ).setTimeToMidday().getDateTime();
 
 		const today : Date = new Date();
 		today.setHours( 12, 0, 0, 0 );
 
-		return ( +today === +dateTime );
+		return ( +today === +adjustedDateTime );
+	}
+
+	/**
+	 *	Validates if input date is same as instance date.
+	 *
+	 *	@param Date dateTime
+	 *
+	 *	@return boolean
+	 */
+	sameDay( dateTime : Date ) : boolean {
+		let currentDateTime = this.clone().setTimeToMidday().getDateTime();
+		let adjustedDateTime = ( new DateTime( dateTime ) ).setTimeToMidday().getDateTime();
+
+		return ( +currentDateTime === +adjustedDateTime );
 	}
 
 	/**
