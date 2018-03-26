@@ -660,12 +660,29 @@ var DateTime = function () {
 	}, {
 		key: 'isToday',
 		value: function isToday(dateTime) {
-			dateTime = new DateTime(dateTime).setTime(12, 0, 0, 0).getDateTime();
+			var adjustedDateTime = new DateTime(dateTime).setTimeToMidday().getDateTime();
 
 			var today = new Date();
 			today.setHours(12, 0, 0, 0);
 
-			return +today === +dateTime;
+			return +today === +adjustedDateTime;
+		}
+
+		/**
+   *	Validates if input date is same as instance date.
+   *
+   *	@param Date dateTime
+   *
+   *	@return boolean
+   */
+
+	}, {
+		key: 'sameDay',
+		value: function sameDay(dateTime) {
+			var currentDateTime = this.clone().setTimeToMidday().getDateTime();
+			var adjustedDateTime = new DateTime(dateTime).setTimeToMidday().getDateTime();
+
+			return +currentDateTime === +adjustedDateTime;
 		}
 
 		/**
