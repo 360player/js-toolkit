@@ -664,14 +664,31 @@ var DateTime = function () {
    */
 
 	}, {
-		key: 'getCalendar',
+		key: 'sameDay',
 
+
+		/**
+   *	Validates if input date is same as instance date.
+   *
+   *	@param Date dateTime
+   *
+   *	@return boolean
+   */
+		value: function sameDay(dateTime) {
+			var currentDateTime = this.clone().setTimeToMidday().toDate();
+			var adjustedDateTime = new DateTime(dateTime).setTimeToMidday().toDate();
+
+			return +currentDateTime === +adjustedDateTime;
+		}
 
 		/**
    *	Returns an array of {@see CalendarDateType}
    *
    *	@return array
    */
+
+	}, {
+		key: 'getCalendar',
 		value: function getCalendar() {
 			var calendar = [];
 			var weekStartsAt = this.weekStartsAtIndex;
@@ -790,12 +807,12 @@ var DateTime = function () {
 	}], [{
 		key: 'isToday',
 		value: function isToday(dateTime) {
-			dateTime = new DateTime(dateTime).setTime(12, 0, 0, 0).toDate();
+			var adjustedDateTime = new DateTime(dateTime).setTime(12, 0, 0, 0).toDate();
 
 			var today = new Date();
 			today.setHours(12, 0, 0, 0);
 
-			return +today === +dateTime;
+			return +today === +adjustedDateTime;
 		}
 	}]);
 	return DateTime;
