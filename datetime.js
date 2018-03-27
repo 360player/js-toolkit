@@ -39,25 +39,31 @@ var DateTime = function () {
 
 
 	/**
-  *  @var string timeZone
+  *  @var string locale
   */
 
 
 	/**
-  *  @var Date startOfMonth
+  *  @var Date endOfMonth
   */
 
 
 	/**
-  *  @var Date startOfDay
+  *  @var Date endOfDay
+  */
+
+
+	/**
+  *  @var Date dateTime
   */
 	function DateTime(dateTime) {
 		var autoResolveDefaultOptions = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 		(0, _classCallCheck3.default)(this, DateTime);
 		this.timeZone = 'Europe/Stockholm';
 		this.locale = 'en-US';
+		this.weekStartsAtIndex = 1;
 
-		this.setDateTime(dateTime);
+		this.fromDate(dateTime);
 
 		if (autoResolveDefaultOptions === true) {
 			// @FLOWFIXME https://github.com/facebook/flow/issues/2801
@@ -78,22 +84,22 @@ var DateTime = function () {
 
 
 	/**
-  *  @var string locale
+  *	@var number weekStartsAtIndex
   */
 
 
 	/**
-  *  @var Date endOfMonth
+  *  @var string timeZone
   */
 
 
 	/**
-  *  @var Date endOfDay
+  *  @var Date startOfMonth
   */
 
 
 	/**
-  *  @var Date dateTime
+  *  @var Date startOfDay
   */
 
 
@@ -147,8 +153,8 @@ var DateTime = function () {
    */
 
 	}, {
-		key: 'setDateTime',
-		value: function setDateTime() {
+		key: 'fromDate',
+		value: function fromDate() {
 			var dateTime = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
 			if (!dateTime) {
@@ -170,8 +176,8 @@ var DateTime = function () {
    */
 
 	}, {
-		key: 'getDateTime',
-		value: function getDateTime() {
+		key: 'toDate',
+		value: function toDate() {
 			return this.dateTime;
 		}
 
@@ -658,15 +664,8 @@ var DateTime = function () {
    */
 
 	}, {
-		key: 'isToday',
-		value: function isToday(dateTime) {
-			var adjustedDateTime = new DateTime(dateTime).setTimeToMidday().getDateTime();
+		key: 'sameDay',
 
-			var today = new Date();
-			today.setHours(12, 0, 0, 0);
-
-			return +today === +adjustedDateTime;
-		}
 
 		/**
    *	Validates if input date is same as instance date.
@@ -675,12 +674,9 @@ var DateTime = function () {
    *
    *	@return boolean
    */
-
-	}, {
-		key: 'sameDay',
 		value: function sameDay(dateTime) {
-			var currentDateTime = this.clone().setTimeToMidday().getDateTime();
-			var adjustedDateTime = new DateTime(dateTime).setTimeToMidday().getDateTime();
+			var currentDateTime = this.clone().setTimeToMidday().toDate();
+			var adjustedDateTime = new DateTime(dateTime).setTimeToMidday().toDate();
 
 			return +currentDateTime === +adjustedDateTime;
 		}
@@ -695,7 +691,7 @@ var DateTime = function () {
 		key: 'getCalendar',
 		value: function getCalendar() {
 			var calendar = [];
-			var weekStartsAt = 1;
+			var weekStartsAt = this.weekStartsAtIndex;
 			var daysInPreviousMonth = (7 + this.startOfMonth.getDay() - weekStartsAt) % 7;
 			var calendarWeeks = Math.ceil((this.daysInMonth + daysInPreviousMonth) / 7);
 			var currentDay = 1 - daysInPreviousMonth;
@@ -715,7 +711,7 @@ var DateTime = function () {
 
 					weekDays.push({
 						dateTime: date,
-						isToday: this.isToday(date.getDateTime()),
+						isToday: DateTime.isToday(date.toDate()),
 						sameMonth: _sameMonth
 					});
 				}
@@ -807,6 +803,16 @@ var DateTime = function () {
 		key: 'daysInMonth',
 		get: function get() {
 			return this.getDaysInMonth(this.dateTime.getMonth());
+		}
+	}], [{
+		key: 'isToday',
+		value: function isToday(dateTime) {
+			var adjustedDateTime = new DateTime(dateTime).setTime(12, 0, 0, 0).toDate();
+
+			var today = new Date();
+			today.setHours(12, 0, 0, 0);
+
+			return +today === +adjustedDateTime;
 		}
 	}]);
 	return DateTime;

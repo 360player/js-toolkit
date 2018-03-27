@@ -22,14 +22,14 @@ describe('initial date time values', () => {
 		const date = new Date();
 		const dateTime = new DateTime();
 
-		expect( dateTime.isToday( date) ).toBe( true );
+		expect( DateTime.isToday( date ) ).toBe( true );
 	});
 
 	it('sets initial date', () => {
 		const date = new Date( PAST_DATE );
 		const dateTime = new DateTime( date );
 
-		expect( dateTime.getDateTime() ).toEqual( date );
+		expect( dateTime.toDate() ).toEqual( date );
 	});
 
 	it('expects a year to be leap year', () => {

@@ -52,12 +52,17 @@ export default class DateTime {
 	/**
 	 *  @var string timeZone
 	 */
-	timeZone = 'Europe/Stockholm';
+	timeZone : string = 'Europe/Stockholm';
 
 	/**
 	 *  @var string locale
 	 */
-	locale = 'en-US';
+	locale : string = 'en-US';
+
+	/**
+	 *	@var number weekStartsAtIndex
+	 */
+	weekStartsAtIndex : number = 1;
 
 	/**
 	 *  Creates a new DateTime instance.
@@ -68,7 +73,7 @@ export default class DateTime {
 	 *  @return void
 	 */
 	constructor( dateTime : Date , autoResolveDefaultOptions : boolean = true ) {
-		this.setDateTime( dateTime );
+		this.fromDate( dateTime );
 
 		if ( autoResolveDefaultOptions === true ) {
 			// @FLOWFIXME https://github.com/facebook/flow/issues/2801
@@ -127,7 +132,7 @@ export default class DateTime {
 	 *
 	 *  @return void
 	 */
-	setDateTime( dateTime : ?Date = null ) {
+	fromDate( dateTime : ?Date = null ) {
 		if ( ! dateTime ) {
 			dateTime = new Date();
 		}
@@ -145,7 +150,7 @@ export default class DateTime {
 	 *
 	 *  @return Date
 	 */
-	getDateTime() : Date {
+	toDate() : Date {
 		return this.dateTime;
 	}
 
@@ -555,8 +560,8 @@ export default class DateTime {
 	 *
 	 *	@return boolean
 	 */
-	isToday( dateTime : Date ) : boolean {
-		let adjustedDateTime = ( new DateTime( dateTime ) ).setTimeToMidday().getDateTime();
+	static isToday( dateTime : Date ) : boolean {
+		const adjustedDateTime = ( new DateTime( dateTime ) ).setTime( 12, 0, 0, 0 ).toDate();
 
 		const today : Date = new Date();
 		today.setHours( 12, 0, 0, 0 );
@@ -572,8 +577,8 @@ export default class DateTime {
 	 *	@return boolean
 	 */
 	sameDay( dateTime : Date ) : boolean {
-		let currentDateTime = this.clone().setTimeToMidday().getDateTime();
-		let adjustedDateTime = ( new DateTime( dateTime ) ).setTimeToMidday().getDateTime();
+		let currentDateTime = this.clone().setTimeToMidday().toDate();
+		let adjustedDateTime = ( new DateTime( dateTime ) ).setTimeToMidday().toDate();
 
 		return ( +currentDateTime === +adjustedDateTime );
 	}
@@ -585,7 +590,7 @@ export default class DateTime {
 	 */
 	getCalendar() : Array<mixed> {
 		let calendar : Array<mixed> = [];
-		const weekStartsAt : number = 1;
+		const weekStartsAt : number = this.weekStartsAtIndex;
 		const daysInPreviousMonth : number = ( 7 + this.startOfMonth.getDay() - weekStartsAt ) % 7;
 		const calendarWeeks : number = Math.ceil( ( this.daysInMonth + daysInPreviousMonth ) / 7 );
 		let currentDay : number = 1 - daysInPreviousMonth;
@@ -605,7 +610,7 @@ export default class DateTime {
 
 				weekDays.push({
 					dateTime : date,
-					isToday : this.isToday( date.getDateTime() ),
+					isToday : DateTime.isToday( date.toDate() ),
 					sameMonth
 				});
 			}
