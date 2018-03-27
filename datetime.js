@@ -24,7 +24,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 
 /**
- *	@type TimeObjectType
+ *	@type CalendarDateType
  */
 var DateTime = function () {
 
@@ -39,22 +39,22 @@ var DateTime = function () {
 
 
 	/**
-  *  @var string locale
+  *	@var number weekStartsAtIndex
   */
 
 
 	/**
-  *  @var Date endOfMonth
+  *  @var string timeZone
   */
 
 
 	/**
-  *  @var Date endOfDay
+  *  @var Date startOfMonth
   */
 
 
 	/**
-  *  @var Date dateTime
+  *  @var Date startOfDay
   */
 	function DateTime(dateTime) {
 		var autoResolveDefaultOptions = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
@@ -62,6 +62,11 @@ var DateTime = function () {
 		this.timeZone = 'Europe/Stockholm';
 		this.locale = 'en-US';
 		this.weekStartsAtIndex = 1;
+		this.meridiemLocaleObject = {
+			am: 'AM',
+			pm: 'PM',
+			prefer12h: true
+		};
 
 		this.fromDate(dateTime);
 
@@ -84,22 +89,27 @@ var DateTime = function () {
 
 
 	/**
-  *	@var number weekStartsAtIndex
+  *	@var MeridiemLocaleType meridiemLocaleObject
   */
 
 
 	/**
-  *  @var string timeZone
+  *  @var string locale
   */
 
 
 	/**
-  *  @var Date startOfMonth
+  *  @var Date endOfMonth
   */
 
 
 	/**
-  *  @var Date startOfDay
+  *  @var Date endOfDay
+  */
+
+
+	/**
+  *  @var Date dateTime
   */
 
 
@@ -142,6 +152,54 @@ var DateTime = function () {
 			endOfMonth.setHours(23, 59, 59, 999);
 			endOfMonth.setDate(daysInMonth);
 			this.endOfMonth = endOfMonth;
+
+			this.aggregateMeridiemLocaleObject();
+		}
+
+		/**
+   *	Aggregates current locale meridiem format.
+   *
+   *	@return void
+   */
+
+	}, {
+		key: 'aggregateMeridiemLocaleObject',
+		value: function aggregateMeridiemLocaleObject() {
+			var am = 'AM';
+			var pm = 'PM';
+			var prefer12h = true;
+
+			try {
+				// @FLOWFIXME https://github.com/facebook/flow/issues/2801
+				var formatter = new Intl.DateTimeFormat(this.locale, {
+					timeZone: 'UTC',
+					hour: 'numeric',
+					hour12: true
+				});
+
+				var dayPeriodFilter = function dayPeriodFilter(n) {
+					return n.type.toLowerCase() === 'dayperiod';
+				};
+
+				var amDate = new Date('1970-01-01T09:00:01Z');
+				var amParts = formatter.formatToParts(amDate).find(dayPeriodFilter);
+				am = amParts && amParts.value ? amParts.value : am;
+
+				var pmDate = new Date('1970-01-01T12:00:01Z');
+				var pmParts = formatter.formatToParts(pmDate).find(dayPeriodFilter);
+				pm = pmParts && pmParts.value ? pmParts.value : pm;
+
+				var reMeridiem = new RegExp(am + '|' + pm, 'g');
+				prefer12h = reMeridiem.test(pmDate.toLocaleTimeString(this.locale, { timeZone: 'UTC' }));
+			} catch (error) {
+				console.error(error);
+			}
+
+			var meridiemLocaleObject = {
+				am: am, pm: pm, prefer12h: prefer12h
+			};
+
+			this.meridiemLocaleObject = meridiemLocaleObject;
 		}
 
 		/**
@@ -219,6 +277,7 @@ var DateTime = function () {
 		key: 'setLocale',
 		value: function setLocale(locale) {
 			this.locale = locale;
+			this.aggregateMeridiemLocaleObject();
 		}
 
 		/**
@@ -603,6 +662,43 @@ var DateTime = function () {
 		}
 
 		/**
+   *	Converts 12h format to 24h format and sets the time accordingly.
+   *
+   *	@param string meridiem
+   *	@param number hour
+   *	@param number minute
+   *	@param number second
+   *	@param number milliSecond
+   *
+   *	@return self
+   */
+
+	}, {
+		key: 'setTimeFrom12hFormat',
+		value: function setTimeFrom12hFormat(meridiem) {
+			var hour = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+			var minute = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+			var second = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
+			var milliSecond = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 0;
+
+			var isValidMeridiem = ['am', 'pm'].includes(meridiem);
+
+			if (!isValidMeridiem) {
+				throw new Error('Invalid meridiem format, expected "am" or "pm", received "' + meridiem + '".');
+			}
+
+			hour = hour > 24 ? 24 : hour;
+
+			if (meridiem === 'am' && hour > 12) {
+				hour -= 12;
+			} else if (meridiem === 'pm' && hour <= 12) {
+				hour += 12;
+			}
+
+			return this.setTime(hour, minute, second, milliSecond);
+		}
+
+		/**
    *	Validates if current DateTime is between two dates.
    *
    *	@param Date startDateTime
@@ -819,7 +915,12 @@ var DateTime = function () {
 }();
 
 /**
- *	@type CalendarDateType
+ *	@type MeridiemLocaleType
+ */
+
+
+/**
+ *	@type TimeObjectType
  */
 
 

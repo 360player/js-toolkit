@@ -20,6 +20,15 @@ type CalendarDateType = {
 };
 
 /**
+ *	@type MeridiemLocaleType
+ */
+type MeridiemLocaleType = {
+	am : string,
+	pm : string,
+	prefer12h : boolean
+};
+
+/**
  *	Date manipulation and presentation helper class.
  */
 export default class DateTime {
@@ -63,6 +72,15 @@ export default class DateTime {
 	 *	@var number weekStartsAtIndex
 	 */
 	weekStartsAtIndex : number = 1;
+
+	/**
+	 *	@var MeridiemLocaleType meridiemLocaleObject
+	 */
+	meridiemLocaleObject : MeridiemLocaleType = {
+		am : 'AM',
+		pm : 'PM',
+		prefer12h : true
+	};
 
 	/**
 	 *  Creates a new DateTime instance.
@@ -123,6 +141,49 @@ export default class DateTime {
 		endOfMonth.setHours( 23, 59, 59, 999 );
 		endOfMonth.setDate( daysInMonth );
 		this.endOfMonth = endOfMonth;
+
+		this.aggregateMeridiemLocaleObject();
+	}
+
+	/**
+	 *	Aggregates current locale meridiem format.
+	 *
+	 *	@return void
+	 */
+	aggregateMeridiemLocaleObject() {
+		let am : string = 'AM';
+		let pm : string = 'PM';
+		let prefer12h : boolean = true;
+
+		try {
+			// @FLOWFIXME https://github.com/facebook/flow/issues/2801
+			const formatter = new Intl.DateTimeFormat( this.locale, {
+				timeZone : 'UTC',
+				hour : 'numeric',
+				hour12 : true
+			});
+
+			const dayPeriodFilter = n => ( n.type.toLowerCase() === 'dayperiod' );
+
+			const amDate : Date = new Date('1970-01-01T09:00:01Z');
+			const amParts = formatter.formatToParts( amDate ).find( dayPeriodFilter );
+			am = ( amParts && amParts.value ) ? amParts.value : am;
+
+			const pmDate : Date = new Date('1970-01-01T12:00:01Z');
+			const pmParts = formatter.formatToParts( pmDate ).find( dayPeriodFilter );
+			pm = ( pmParts && pmParts.value ) ? pmParts.value : pm;
+
+			let reMeridiem : RegExp = new RegExp(`${am}|${pm}`, 'g');
+			prefer12h = reMeridiem.test( pmDate.toLocaleTimeString( this.locale, { timeZone : 'UTC' }) );
+		} catch ( error ) {
+			throw new Error( error );
+		}
+
+		const meridiemLocaleObject : MeridiemLocaleType = {
+			am, pm, prefer12h
+		};
+
+		this.meridiemLocaleObject = meridiemLocaleObject;
 	}
 
 	/**
@@ -183,6 +244,7 @@ export default class DateTime {
 	 */
 	setLocale( locale : string ) {
 		this.locale = locale;
+		this.aggregateMeridiemLocaleObject();
 	}
 
 	/**
@@ -507,6 +569,35 @@ export default class DateTime {
 	 */
 	setTimeToMidnight() : DateTime {
 		return this.setTime( 0, 0, 0, 1 );
+	}
+
+	/**
+	 *	Converts 12h format to 24h format and sets the time accordingly.
+	 *
+	 *	@param string meridiem
+	 *	@param number hour
+	 *	@param number minute
+	 *	@param number second
+	 *	@param number milliSecond
+	 *
+	 *	@return self
+	 */
+	setTimeFrom12hFormat( meridiem : 'am' | 'pm', hour : number = 0, minute : number = 0, second : number = 0, milliSecond : number = 0 ) : DateTime {
+		const isValidMeridiem : boolean = [ 'am', 'pm' ].includes( meridiem );
+
+		if ( ! isValidMeridiem ) {
+			throw new Error( `Invalid meridiem format, expected "am" or "pm", received "${meridiem}".` );
+		}
+
+		hour = ( hour > 24 ) ? 24 : hour;
+
+		if ( meridiem === 'am' && hour > 12 ) {
+			hour -= 12;
+		} else if ( meridiem === 'pm' && hour <= 12 ) {
+			hour += 12;
+		}
+
+		return this.setTime( hour, minute, second, milliSecond );
 	}
 
 	/**
