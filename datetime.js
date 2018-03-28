@@ -24,6 +24,11 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 
 /**
+ *	@type MeridiemType
+ */
+
+
+/**
  *	@type CalendarDateType
  */
 var DateTime = function () {
@@ -192,7 +197,7 @@ var DateTime = function () {
 				var reMeridiem = new RegExp(am + '|' + pm, 'g');
 				prefer12h = reMeridiem.test(pmDate.toLocaleTimeString(this.locale, { timeZone: 'UTC' }));
 			} catch (error) {
-				console.error(error);
+				throw new Error(error);
 			}
 
 			var meridiemLocaleObject = {
@@ -356,6 +361,38 @@ var DateTime = function () {
 			}
 
 			return null;
+		}
+
+		/**
+   *	Rounds date to nearest granularity.
+   *
+   *	@param number value
+   *  @param string granularity
+   *	@param RoundDirectionType roundDirection
+   *
+   *	@return self
+   */
+
+	}, {
+		key: 'toNearestGranularity',
+		value: function toNearestGranularity(value, granularity) {
+			var roundDirection = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'up';
+
+			var duration = this.durationOf(value, granularity);
+
+			if (!duration) {
+				throw new Error('Not a valid time granularity.');
+			}
+
+			var timestamp = +this.dateTime;
+			var roundingMethod = roundDirection === 'up' ? 'ceil' : 'floor';
+			var roundBy = Math[roundingMethod];
+
+			var adjustedTimestamp = roundBy(timestamp / duration) * duration;
+
+			this.fromDate(new Date(adjustedTimestamp));
+
+			return this;
 		}
 
 		/**
@@ -664,7 +701,7 @@ var DateTime = function () {
 		/**
    *	Converts 12h format to 24h format and sets the time accordingly.
    *
-   *	@param string meridiem
+   *	@param MeridiemType meridiem
    *	@param number hour
    *	@param number minute
    *	@param number second
@@ -850,6 +887,22 @@ var DateTime = function () {
 		}
 
 		/**
+   *	Returns time in 24h format.
+   *
+   *	@return string
+   */
+
+	}, {
+		key: 'to24hTimeString',
+		value: function to24hTimeString() {
+			return this.dateTime.toLocaleTimeString(this.locale, {
+				hour12: false,
+				hour: '2-digit',
+				minute: '2-digit'
+			});
+		}
+
+		/**
    *	Returns localized weekday.
    *
    *	@param string formatLength
@@ -913,6 +966,11 @@ var DateTime = function () {
 	}]);
 	return DateTime;
 }();
+
+/**
+ *	@type RoundDirectionType
+ */
+
 
 /**
  *	@type MeridiemLocaleType
