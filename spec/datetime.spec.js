@@ -62,4 +62,16 @@ describe('initial date time values', () => {
 		expect( dateTime.daysInMonth ).toBe( 28 );
 	});
 
+	it('rounds to nearest hour', () => {
+		const date = new Date( FUTURE_DATE );
+		const dateTime = new DateTime( date );
+
+		const controlHour = dateTime.getTime().hour;
+
+		dateTime.toNearestGranularity( 1, 'hour' );
+		const adjustedHour = dateTime.getTime().hour;
+
+		expect( adjustedHour ).toBe( controlHour + 1 );
+	});
+
 });

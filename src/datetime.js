@@ -29,6 +29,16 @@ type MeridiemLocaleType = {
 };
 
 /**
+ *	@type MeridiemType
+ */
+type MeridiemType = 'am' | 'pm';
+
+/**
+ *	@type RoundDirectionType
+ */
+type RoundDirectionType = 'up' | 'down';
+
+/**
  *	Date manipulation and presentation helper class.
  */
 export default class DateTime {
@@ -324,6 +334,33 @@ export default class DateTime {
 	}
 
 	/**
+	 *	Rounds date to nearest granularity.
+	 *
+	 *	@param number value
+	 *  @param string granularity
+	 *	@param RoundDirectionType roundDirection
+	 *
+	 *	@return self
+	 */
+	toNearestGranularity( value : number, granularity : string, roundDirection : RoundDirectionType = 'up' ) : DateTime {
+		const duration = this.durationOf( value, granularity );
+
+		if ( ! duration ) {
+			throw new Error( 'Not a valid time granularity.' );
+		}
+
+		const timestamp = +this.dateTime;
+		const roundingMethod = roundDirection === 'up' ? 'ceil' : 'floor';
+		const roundBy = Math[ roundingMethod ];
+
+		let adjustedTimestamp = roundBy( timestamp / duration ) * duration;
+
+		this.fromDate( new Date( adjustedTimestamp ) );
+
+		return this;
+	}
+
+	/**
 	 *  Decrements nth granularity from date time.
 	 *
 	 *  @param string granularity
@@ -574,7 +611,7 @@ export default class DateTime {
 	/**
 	 *	Converts 12h format to 24h format and sets the time accordingly.
 	 *
-	 *	@param string meridiem
+	 *	@param MeridiemType meridiem
 	 *	@param number hour
 	 *	@param number minute
 	 *	@param number second
@@ -582,7 +619,7 @@ export default class DateTime {
 	 *
 	 *	@return self
 	 */
-	setTimeFrom12hFormat( meridiem : 'am' | 'pm', hour : number = 0, minute : number = 0, second : number = 0, milliSecond : number = 0 ) : DateTime {
+	setTimeFrom12hFormat( meridiem : MeridiemType, hour : number = 0, minute : number = 0, second : number = 0, milliSecond : number = 0 ) : DateTime {
 		const isValidMeridiem : boolean = [ 'am', 'pm' ].includes( meridiem );
 
 		if ( ! isValidMeridiem ) {
@@ -732,6 +769,19 @@ export default class DateTime {
 	 */
 	toTimeString() : string {
 		return this.dateTime.toLocaleTimeString( this.locale, {
+			hour : '2-digit',
+			minute : '2-digit'
+		});
+	}
+
+	/**
+	 *	Returns time in 24h format.
+	 *
+	 *	@return string
+	 */
+	to24hTimeString() : string {
+		return this.dateTime.toLocaleTimeString( this.locale, {
+			hour12 : false,
 			hour : '2-digit',
 			minute : '2-digit'
 		});
