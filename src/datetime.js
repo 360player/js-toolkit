@@ -299,7 +299,7 @@ export default class DateTime {
 		let am : string = 'AM';
 		let pm : string = 'PM';
 		let prefer12h : boolean = true;
-		let date = new Date('1970-01-01T09:00:01Z');
+		let date = new Date( 1970, 0, 1, 0, 0, 0, 0 );
 
 		try {
 			// @FLOWFIXME https://github.com/facebook/flow/issues/2801
@@ -314,11 +314,11 @@ export default class DateTime {
 			const amParts = formatter.formatToParts( date ).find( dayPeriodFilter );
 			am = ( amParts && amParts.value ) ? amParts.value : am;
 
-			date.setHours( 12, 0, 0, 1 );
+			date.setHours( 23, 59, 59, 999 );
 			const pmParts = formatter.formatToParts( date ).find( dayPeriodFilter );
 			pm = ( pmParts && pmParts.value ) ? pmParts.value : pm;
 
-			let reMeridiem : RegExp = new RegExp(`${am}|${pm}`, 'g');
+			let reMeridiem : RegExp = new RegExp(`${am}|${pm}`, 'g' );
 			prefer12h = reMeridiem.test( date.toLocaleTimeString( this.locale, { timeZone : 'UTC' }) );
 		} catch ( error ) {
 			throw new Error( error );
