@@ -317,7 +317,7 @@ var DateTime = function () {
 			var am = 'AM';
 			var pm = 'PM';
 			var prefer12h = true;
-			var date = new Date('1970-01-01T09:00:01Z');
+			var date = new Date(1970, 0, 1, 0, 0, 0, 0);
 
 			try {
 				// @FLOWFIXME https://github.com/facebook/flow/issues/2801
@@ -334,7 +334,7 @@ var DateTime = function () {
 				var amParts = formatter.formatToParts(date).find(dayPeriodFilter);
 				am = amParts && amParts.value ? amParts.value : am;
 
-				date.setHours(12, 0, 0, 1);
+				date.setHours(23, 59, 59, 999);
 				var pmParts = formatter.formatToParts(date).find(dayPeriodFilter);
 				pm = pmParts && pmParts.value ? pmParts.value : pm;
 
