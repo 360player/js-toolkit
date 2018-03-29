@@ -681,6 +681,64 @@ export default class DateTime {
 	}
 
 	/**
+	 *  Decrements nth granularity from date time.
+	 *
+	 *  @param string granularity
+	 *  @param number decrementValue
+	 *
+	 *  @return self
+	 */
+	prev( granularity : string, decrementValue : number = 1 ) : DateTime {
+		if ( granularity.match( /years?/ ) ) {
+			const prevFullYear : number = this.dateTime.getFullYear() - Math.abs( Math.ceil( decrementValue ) );
+
+			this.dateTime.setFullYear( prevFullYear );
+		} else if ( granularity.match( /months?/ ) ) {
+			const prevMonths : number = this.dateTime.getMonth() - Math.abs( Math.ceil( decrementValue ) );
+
+			this.dateTime.setMonth( prevMonths );
+		} else {
+			let timestamp : number = this.dateTime.getTime();
+			let duration : ?number = this.durationOf( decrementValue, granularity );
+
+			this.dateTime = new Date( Math.abs( timestamp - parseInt( duration ) ) );
+		}
+
+		this.aggregateDateBoundsTimestamps();
+
+		return this;
+	}
+
+	/**
+	 *  Increments nth granularity to date time.
+	 *
+	 *  @param string granularity
+	 *  @param number incrementValue
+	 *
+	 *  @return self
+	 */
+	next( granularity : string, incrementValue : number = 1 ) : DateTime {
+		if ( granularity.match( /years?/ ) ) {
+			const nextFullYear = this.dateTime.getFullYear() + Math.abs( Math.ceil( incrementValue ) );
+
+			this.dateTime.setFullYear( nextFullYear );
+		} else if ( granularity.match( /months?/ ) ) {
+			const nextMonths = this.dateTime.getMonth() + Math.abs( Math.ceil( incrementValue ) );
+
+			this.dateTime.setMonth( nextMonths );
+		} else {
+			let timestamp : number = this.dateTime.getTime();
+			let duration : ?number = this.durationOf( incrementValue, granularity );
+
+			this.dateTime = new Date( timestamp + parseInt( duration ) );
+		}
+
+		this.aggregateDateBoundsTimestamps();
+
+		return this;
+	}
+
+	/**
 	 *	Returns localized representation of date, assumes instance locale variable.
 	 *
 	 *	@param LocaleOptionsType formatOptions
@@ -786,7 +844,8 @@ export class Calendar {
 				const calendarDay : CalendarDayType = {
 					isToday : DateTime.isToday( +calendarDate ),
 					isCurrentMonth : ( calendarDate.getMonth() === month - 1 ),
-					timestamp : +calendarDate
+					timestamp : +calendarDate,
+					day : calendarDate.getDate()
 				};
 
 				calendar.push( calendarDay );
