@@ -779,6 +779,74 @@ var DateTime = function () {
 		}
 
 		/**
+   *  Decrements nth granularity from date time.
+   *
+   *  @param string granularity
+   *  @param number decrementValue
+   *
+   *  @return self
+   */
+
+	}, {
+		key: 'prev',
+		value: function prev(granularity) {
+			var decrementValue = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+
+			if (granularity.match(/years?/)) {
+				var prevFullYear = this.dateTime.getFullYear() - Math.abs(Math.ceil(decrementValue));
+
+				this.dateTime.setFullYear(prevFullYear);
+			} else if (granularity.match(/months?/)) {
+				var prevMonths = this.dateTime.getMonth() - Math.abs(Math.ceil(decrementValue));
+
+				this.dateTime.setMonth(prevMonths);
+			} else {
+				var _timestamp = this.dateTime.getTime();
+				var duration = this.durationOf(decrementValue, granularity);
+
+				this.dateTime = new Date(Math.abs(_timestamp - parseInt(duration)));
+			}
+
+			this.aggregateDateBoundsTimestamps();
+
+			return this;
+		}
+
+		/**
+   *  Increments nth granularity to date time.
+   *
+   *  @param string granularity
+   *  @param number incrementValue
+   *
+   *  @return self
+   */
+
+	}, {
+		key: 'next',
+		value: function next(granularity) {
+			var incrementValue = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+
+			if (granularity.match(/years?/)) {
+				var nextFullYear = this.dateTime.getFullYear() + Math.abs(Math.ceil(incrementValue));
+
+				this.dateTime.setFullYear(nextFullYear);
+			} else if (granularity.match(/months?/)) {
+				var nextMonths = this.dateTime.getMonth() + Math.abs(Math.ceil(incrementValue));
+
+				this.dateTime.setMonth(nextMonths);
+			} else {
+				var _timestamp2 = this.dateTime.getTime();
+				var duration = this.durationOf(incrementValue, granularity);
+
+				this.dateTime = new Date(_timestamp2 + parseInt(duration));
+			}
+
+			this.aggregateDateBoundsTimestamps();
+
+			return this;
+		}
+
+		/**
    *	Returns localized representation of date, assumes instance locale variable.
    *
    *	@param LocaleOptionsType formatOptions
@@ -957,7 +1025,8 @@ var Calendar = exports.Calendar = function () {
 					var calendarDay = {
 						isToday: DateTime.isToday(+calendarDate),
 						isCurrentMonth: calendarDate.getMonth() === month - 1,
-						timestamp: +calendarDate
+						timestamp: +calendarDate,
+						day: calendarDate.getDate()
 					};
 
 					calendar.push(calendarDay);
