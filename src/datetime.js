@@ -299,34 +299,25 @@ export default class DateTime {
 		let am : string = 'AM';
 		let pm : string = 'PM';
 		let prefer12h : boolean = true;
-		let date = new Date( 1970, 0, 1, 0, 0, 0, 0 );
 
 		try {
 			// @FLOWFIXME https://github.com/facebook/flow/issues/2801
-			const formatter = new Intl.DateTimeFormat( this.locale, {
-				timeZone : 'UTC',
-				hour : 'numeric',
-				hour12 : true
-			});
-
+			const formatter = new Intl.DateTimeFormat( this.locale, { hour : 'numeric', hour12 : true });
 			const dayPeriodFilter = n => ( n.type.toLowerCase() === 'dayperiod' );
 
-			const amParts = formatter.formatToParts( date ).find( dayPeriodFilter );
-			am = ( amParts && amParts.value ) ? amParts.value : am;
+			let amDate : Date = new Date( 1970, 0, 1, 0, 0, 0, 0 );
+			am = formatter.formatToParts( amDate ).find( dayPeriodFilter ).value;
 
-			date.setHours( 23, 59, 59, 999 );
-			const pmParts = formatter.formatToParts( date ).find( dayPeriodFilter );
-			pm = ( pmParts && pmParts.value ) ? pmParts.value : pm;
+			let pmDate : Date = new Date( 1970, 0, 1, 23, 59, 59, 999 );
+			pm = formatter.formatToParts( pmDate ).find( dayPeriodFilter ).value;
 
 			let reMeridiem : RegExp = new RegExp(`${am}|${pm}`, 'g' );
-			prefer12h = reMeridiem.test( date.toLocaleTimeString( this.locale, { timeZone : 'UTC' }) );
+			prefer12h = reMeridiem.test( amDate.toLocaleTimeString( this.locale ) );
 		} catch ( error ) {
 			throw new Error( error );
 		}
 
-		const meridiemLocaleObject : MeridiemLocaleType = {
-			am, pm, prefer12h
-		};
+		const meridiemLocaleObject : MeridiemLocaleType = { am, pm, prefer12h };
 
 		this.meridiemLocaleObject = meridiemLocaleObject;
 	}

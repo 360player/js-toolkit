@@ -317,36 +317,27 @@ var DateTime = function () {
 			var am = 'AM';
 			var pm = 'PM';
 			var prefer12h = true;
-			var date = new Date(1970, 0, 1, 0, 0, 0, 0);
 
 			try {
 				// @FLOWFIXME https://github.com/facebook/flow/issues/2801
-				var formatter = new Intl.DateTimeFormat(this.locale, {
-					timeZone: 'UTC',
-					hour: 'numeric',
-					hour12: true
-				});
-
+				var formatter = new Intl.DateTimeFormat(this.locale, { hour: 'numeric', hour12: true });
 				var dayPeriodFilter = function dayPeriodFilter(n) {
 					return n.type.toLowerCase() === 'dayperiod';
 				};
 
-				var amParts = formatter.formatToParts(date).find(dayPeriodFilter);
-				am = amParts && amParts.value ? amParts.value : am;
+				var amDate = new Date(1970, 0, 1, 0, 0, 0, 0);
+				am = formatter.formatToParts(amDate).find(dayPeriodFilter).value;
 
-				date.setHours(23, 59, 59, 999);
-				var pmParts = formatter.formatToParts(date).find(dayPeriodFilter);
-				pm = pmParts && pmParts.value ? pmParts.value : pm;
+				var pmDate = new Date(1970, 0, 1, 23, 59, 59, 999);
+				pm = formatter.formatToParts(pmDate).find(dayPeriodFilter).value;
 
 				var reMeridiem = new RegExp(am + '|' + pm, 'g');
-				prefer12h = reMeridiem.test(date.toLocaleTimeString(this.locale, { timeZone: 'UTC' }));
+				prefer12h = reMeridiem.test(amDate.toLocaleTimeString(this.locale));
 			} catch (error) {
 				throw new Error(error);
 			}
 
-			var meridiemLocaleObject = {
-				am: am, pm: pm, prefer12h: prefer12h
-			};
+			var meridiemLocaleObject = { am: am, pm: pm, prefer12h: prefer12h };
 
 			this.meridiemLocaleObject = meridiemLocaleObject;
 		}

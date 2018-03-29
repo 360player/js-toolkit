@@ -1,14 +1,16 @@
 /* @dependencies */
-import DateTime, { Calendar } from '../src/datetime';
+import DateTime from '../src/datetime';
 
-describe('Calendar', () => {
+describe('DateTime', () => {
 
-	it('can generate a month', () => {
+	it('correctly aggregates localized meridiems', () => {
+		const date = new Date();
+		const dateTime = new DateTime( date );
+		dateTime.aggregateMeridiemLocaleObject();
 
-		console.time('execTime');
-		console.log( Calendar.generate( 2018, 3 ) );
-		console.timeEnd('execTime');
+		const { am, pm } = dateTime.meridiemLocaleObject;
 
+		expect( am ).not.toEqual( pm );
 	});
 
 });
