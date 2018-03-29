@@ -903,12 +903,12 @@ var DateTime = function () {
 	}, {
 		key: 'toWeekdayString',
 		value: function toWeekdayString() {
-			return this.toLocaleTimeString({ weekday: 'short' });
+			return this.toLocaleDateString({ weekday: 'short' });
 		}
 	}, {
 		key: 'toLongWeekdayString',
 		value: function toLongWeekdayString() {
-			return this.toLocaleTimeString({ weekday: 'long' });
+			return this.toLocaleDateString({ weekday: 'long' });
 		}
 
 		/**

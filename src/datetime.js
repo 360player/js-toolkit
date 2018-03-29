@@ -781,11 +781,11 @@ export default class DateTime {
 	}
 
 	toWeekdayString() : string {
-		return this.toLocaleTimeString({ weekday : 'short' });
+		return this.toLocaleDateString({ weekday : 'short' });
 	}
 
 	toLongWeekdayString() : string {
-		return this.toLocaleTimeString({ weekday : 'long' });
+		return this.toLocaleDateString({ weekday : 'long' });
 	}
 
 	/**
