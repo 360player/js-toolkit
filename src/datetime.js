@@ -1,6 +1,21 @@
 /* @flow */
 
 /**
+ *  @const string DEFAULT_TIMEZONE
+ */
+const DEFAULT_TIMEZONE : string = 'Europe/Stockholm';
+
+/**
+ *  @const string DEFAULT_LOCALE
+ */
+const DEFAULT_LOCALE : string = 'en-US';
+
+/**
+ *	@type TimeType
+ */
+type TimeType = number;
+
+/**
  *	@type TimeObjectType
  */
 type TimeObjectType = {
@@ -8,15 +23,6 @@ type TimeObjectType = {
 	minute : number,
 	second : number,
 	milliSecond : number
-};
-
-/**
- *	@type CalendarDateType
- */
-type CalendarDateType = {
-	dateTime : DateTime,
-	isToday : boolean,
-	sameMonth : boolean
 };
 
 /**
@@ -39,6 +45,11 @@ type MeridiemType = 'am' | 'pm';
 type RoundDirectionType = 'up' | 'down';
 
 /**
+ *	@type LocaleOptionsType
+ */
+type LocaleOptionsType = { [ key : string ] : string | boolean };
+
+/**
  *	Date manipulation and presentation helper class.
  */
 export default class DateTime {
@@ -49,29 +60,61 @@ export default class DateTime {
 	dateTime : Date;
 
 	/**
-	 *  @var Date startOfDay
+	 *  @var TimeType startOfDay
 	 */
-	startOfDay : Date;
+	startOfDay : TimeType;
 
 	/**
-	 *  @var Date endOfDay
+	 *  @var TimeType endOfDay
 	 */
-	endOfDay : Date;
+	endOfDay : TimeType;
 
 	/**
-	 *  @var Date startOfMonth
+	 *  @var TimeType startOfMonth
 	 */
-	startOfMonth : Date;
+	startOfMonth : TimeType;
 
 	/**
-	 *  @var Date endOfMonth
+	 *  @var TimeType endOfMonth
 	 */
-	endOfMonth : Date;
+	endOfMonth : TimeType;
 
 	/**
 	 *  @var string timeZone
 	 */
-	timeZone : string = 'Europe/Stockholm';
+	timeZone : string = DEFAULT_TIMEZONE;
+
+	/**
+	 *  @var string locale
+	 */
+	locale : string = DEFAULT_LOCALE;
+
+	/**
+	 *	@var bool enforce24hFormat
+	 */
+	enforce24hFormat : boolean = false;
+
+	/**
+	 *	@var MeridiemLocaleType meridiemLocaleObject
+	 */
+	meridiemLocaleObject : MeridiemLocaleType;
+
+	/**
+	 *  Creates a new DateTime instance.
+	 *
+	 *  @param Date date
+	 *	@param bool skipBoundsAggregation
+	 *	@param bool autoResolveDefaultOptions
+	 *
+	 *  @return void
+	 */
+	constructor( date : Date, skipBoundsAggregation : boolean = false, autoResolveDefaultOptions : boolean = true ) {
+		this.fromDate( date, skipBoundsAggregation );
+
+		if ( autoResolveDefaultOptions ) {
+			this.resolveDateTimeOptions();
+		}
+	}
 
 	/**
 	 *  @var string locale
@@ -79,141 +122,36 @@ export default class DateTime {
 	locale : string = 'en-US';
 
 	/**
-	 *	@var number weekStartsAtIndex
-	 */
-	weekStartsAtIndex : number = 1;
-
-	/**
-	 *	@var MeridiemLocaleType meridiemLocaleObject
-	 */
-	meridiemLocaleObject : MeridiemLocaleType = {
-		am : 'AM',
-		pm : 'PM',
-		prefer12h : true
-	};
-
-	/**
-	 *  Creates a new DateTime instance.
-	 *
-	 *  @param Date dateTime
-	 *  @param bool autoResolveDefaultOptions
-	 *
-	 *  @return void
-	 */
-	constructor( dateTime : Date , autoResolveDefaultOptions : boolean = true ) {
-		this.fromDate( dateTime );
-
-		if ( autoResolveDefaultOptions === true ) {
-			// @FLOWFIXME https://github.com/facebook/flow/issues/2801
-			const { timeZone, locale } = Intl.DateTimeFormat().resolvedOptions();
-
-			this.setTimeZone( timeZone );
-			this.setLocale( locale );
-		}
-	}
-
-	/**
-	 *	Shallow clone of current instance.
-	 *
-	 *	@return DateTime
-	 */
-	clone() : DateTime {
-		const clonedDateTime = new DateTime( new Date( +this.dateTime ) );
-		clonedDateTime.setTimeZone( this.getTimeZone() );
-		clonedDateTime.setLocale( this.getLocale() );
-		clonedDateTime.aggregateDateTime();
-
-		return clonedDateTime;
-	}
-
-	/**
-	 *	Aggregates start/end-of data based on current set date.
+	 *	Sets timezone and locale based on current device resolved options.
 	 *
 	 *	@return void
 	 */
-	aggregateDateTime() {
-		const startOfDay = new Date( +this.dateTime );
-		startOfDay.setHours( 0, 0, 0, 1 );
-		this.startOfDay = startOfDay;
+	resolveDateTimeOptions() {
+		// @FLOWFIXME https://github.com/facebook/flow/issues/2801
+		const { timeZone, locale } = Intl.DateTimeFormat().resolvedOptions();
 
-		const endOfDay = new Date( +this.dateTime );
-		endOfDay.setHours( 23, 59, 59, 999 );
-		this.endOfDay = endOfDay;
-
-		const startOfMonth = new Date( +this.dateTime );
-		startOfMonth.setHours( 0, 0, 0, 1 );
-		startOfMonth.setDate( 1 );
-		this.startOfMonth = startOfMonth;
-
-		const daysInMonth = this.getDaysInMonth( this.dateTime.getMonth() );
-
-		const endOfMonth = new Date( +this.dateTime );
-		endOfMonth.setHours( 23, 59, 59, 999 );
-		endOfMonth.setDate( daysInMonth );
-		this.endOfMonth = endOfMonth;
-
-		this.aggregateMeridiemLocaleObject();
-	}
-
-	/**
-	 *	Aggregates current locale meridiem format.
-	 *
-	 *	@return void
-	 */
-	aggregateMeridiemLocaleObject() {
-		let am : string = 'AM';
-		let pm : string = 'PM';
-		let prefer12h : boolean = true;
-
-		try {
-			// @FLOWFIXME https://github.com/facebook/flow/issues/2801
-			const formatter = new Intl.DateTimeFormat( this.locale, {
-				timeZone : 'UTC',
-				hour : 'numeric',
-				hour12 : true
-			});
-
-			const dayPeriodFilter = n => ( n.type.toLowerCase() === 'dayperiod' );
-
-			const amDate : Date = new Date('1970-01-01T09:00:01Z');
-			const amParts = formatter.formatToParts( amDate ).find( dayPeriodFilter );
-			am = ( amParts && amParts.value ) ? amParts.value : am;
-
-			const pmDate : Date = new Date('1970-01-01T12:00:01Z');
-			const pmParts = formatter.formatToParts( pmDate ).find( dayPeriodFilter );
-			pm = ( pmParts && pmParts.value ) ? pmParts.value : pm;
-
-			let reMeridiem : RegExp = new RegExp(`${am}|${pm}`, 'g');
-			prefer12h = reMeridiem.test( pmDate.toLocaleTimeString( this.locale, { timeZone : 'UTC' }) );
-		} catch ( error ) {
-			throw new Error( error );
-		}
-
-		const meridiemLocaleObject : MeridiemLocaleType = {
-			am, pm, prefer12h
-		};
-
-		this.meridiemLocaleObject = meridiemLocaleObject;
+		this.setTimeZone( timeZone );
+		this.setLocale( locale );
 	}
 
 	/**
 	 *  Sets current date time object.
 	 *
 	 *  @param Date dateTime
+	 *	@param boolean skipBoundsAggregation
 	 *
 	 *  @return void
 	 */
-	fromDate( dateTime : ?Date = null ) {
-		if ( ! dateTime ) {
-			dateTime = new Date();
-		}
-
+	fromDate( dateTime : Date, skipBoundsAggregation : boolean = false ) {
 		if ( ( dateTime instanceof Date ) === false ) {
-			throw new Error( `Must be instance of Date` );
+			throw new Error( 'Must be instance of Date' );
 		}
 
 		this.dateTime = dateTime;
-		this.aggregateDateTime();
+
+		if ( ! skipBoundsAggregation ) {
+			this.aggregateDateBoundsTimestamps();
+		}
 	}
 
 	/**
@@ -254,7 +192,6 @@ export default class DateTime {
 	 */
 	setLocale( locale : string ) {
 		this.locale = locale;
-		this.aggregateMeridiemLocaleObject();
 	}
 
 	/**
@@ -269,29 +206,29 @@ export default class DateTime {
 	/**
 	 *  @prop bool isLeapYear
 	 */
-	get isLeapYear() : boolean {
-		const year = this.dateTime.getFullYear();
-
+	static isLeapYear( year : number ) : boolean {
 		return ( ( ( year % 4 === 0 ) && ( year % 100 !== 0 ) ) || ( year % 400 === 0 ) );
 	}
 
 	/**
-	 *  @prop number daysInYear
+	 *  Returns number of days in current year
 	 */
-	get daysInYear() : 366 | 365 {
-		return ( this.isLeapYear ) ? 366 : 365;
+	static daysInYear( year : number ) : number {
+		return ( DateTime.isLeapYear( year ) ) ? 366 : 365;
 	}
 
 	/**
 	 *  Returns the number of days in input month.
 	 *
-	 *  @param number monthOffset
+	 *	@param number year
+	 *  @param number month
 	 *
 	 *  @return number
 	 */
-	getDaysInMonth( monthOffset : number ) : number {
-		let daysInMonths = [ 31, ( this.isLeapYear ? 29 : 28 ), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ];
+	static getDaysInMonth( year : number, month : number ) : number {
+		let daysInMonths = [ 31, ( DateTime.isLeapYear( year ) ? 29 : 28 ), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ];
 
+		let monthOffset = month - 1;
 		if ( monthOffset > 11 ) monthOffset = 11;
 		if ( monthOffset < 0 ) monthOffset = 0;
 
@@ -302,7 +239,96 @@ export default class DateTime {
 	 *  @prop number daysInMonth
 	 */
 	get daysInMonth() : number {
-		return this.getDaysInMonth( this.dateTime.getMonth() );
+		return DateTime.getDaysInMonth( this.dateTime.getFullYear(), this.dateTime.getMonth() );
+	}
+
+	/**
+	 *	Calculates and sets start and end of day from input date.
+	 *
+	 *	@param Date date
+	 *
+	 *	@return void
+	 */
+	aggregateStartAndEndOfDay( date : Date ) {
+		// @NOTE Get start of current date as timestamp
+		date.setHours( 0, 0, 0, 0 );
+		this.startOfDay = +date;
+
+		// @NOTE Get end of current date as timestamp
+		date.setHours( 23, 59, 59, 999 );
+		this.endOfDay = +date;
+	}
+
+	/**
+	 *	Calculates and sets start and end of month from input date.
+	 *
+	 *	@param Date date
+	 *
+	 *	@return void
+	 */
+	aggregateStartAndEndOfMonth( date : Date ) {
+		// @NOTE Get start of current month as timestamp
+		date.setHours( 0, 0, 0, 0 );
+		date.setDate( 1 );
+		this.startOfMonth = +date;
+
+		// @NOTE Get end of current month as timestamp
+		date.setHours( 23, 59, 59, 999 );
+		date.setDate( DateTime.getDaysInMonth( date.getFullYear(), date.getMonth() + 1 ) );
+		this.endOfMonth = +date;
+	}
+
+	/**
+	 *	Calculates start of, and end of day and month based on instance date.
+	 *
+	 *	@return void
+	 */
+	aggregateDateBoundsTimestamps() {
+		const date : Date = new Date( +this.dateTime );
+
+		this.aggregateStartAndEndOfDay( date );
+		this.aggregateStartAndEndOfMonth( date );
+	}
+
+	/**
+	 *	Aggregates current locale meridiem format.
+	 *
+	 *	@return void
+	 */
+	aggregateMeridiemLocaleObject() {
+		let am : string = 'AM';
+		let pm : string = 'PM';
+		let prefer12h : boolean = true;
+		let date = new Date('1970-01-01T09:00:01Z');
+
+		try {
+			// @FLOWFIXME https://github.com/facebook/flow/issues/2801
+			const formatter = new Intl.DateTimeFormat( this.locale, {
+				timeZone : 'UTC',
+				hour : 'numeric',
+				hour12 : true
+			});
+
+			const dayPeriodFilter = n => ( n.type.toLowerCase() === 'dayperiod' );
+
+			const amParts = formatter.formatToParts( date ).find( dayPeriodFilter );
+			am = ( amParts && amParts.value ) ? amParts.value : am;
+
+			date.setHours( 12, 0, 0, 1 );
+			const pmParts = formatter.formatToParts( date ).find( dayPeriodFilter );
+			pm = ( pmParts && pmParts.value ) ? pmParts.value : pm;
+
+			let reMeridiem : RegExp = new RegExp(`${am}|${pm}`, 'g');
+			prefer12h = reMeridiem.test( date.toLocaleTimeString( this.locale, { timeZone : 'UTC' }) );
+		} catch ( error ) {
+			throw new Error( error );
+		}
+
+		const meridiemLocaleObject : MeridiemLocaleType = {
+			am, pm, prefer12h
+		};
+
+		this.meridiemLocaleObject = meridiemLocaleObject;
 	}
 
 	/**
@@ -355,65 +381,11 @@ export default class DateTime {
 
 		let adjustedTimestamp = roundBy( timestamp / duration ) * duration;
 
-		this.fromDate( new Date( adjustedTimestamp ) );
-
-		return this;
-	}
-
-	/**
-	 *  Decrements nth granularity from date time.
-	 *
-	 *  @param string granularity
-	 *  @param number decrementValue
-	 *
-	 *  @return self
-	 */
-	prev( granularity : string, decrementValue : number = 1 ) : DateTime {
-		if ( granularity.match( /years?/ ) ) {
-			const prevFullYear : number = this.dateTime.getFullYear() - Math.abs( Math.ceil( decrementValue ) );
-
-			this.dateTime.setFullYear( prevFullYear );
-		} else if ( granularity.match( /months?/ ) ) {
-			const prevMonths : number = this.dateTime.getMonth() - Math.abs( Math.ceil( decrementValue ) );
-
-			this.dateTime.setMonth( prevMonths );
-		} else {
-			let timestamp : number = this.dateTime.getTime();
-			let duration : ?number = this.durationOf( decrementValue, granularity );
-
-			this.dateTime = new Date( Math.abs( timestamp - parseInt( duration ) ) );
+		if ( adjustedTimestamp > this.endOfDay ) {
+			adjustedTimestamp = this.endOfDay;
 		}
 
-		this.aggregateDateTime();
-
-		return this;
-	}
-
-	/**
-	 *  Increments nth granularity to date time.
-	 *
-	 *  @param string granularity
-	 *  @param number incrementValue
-	 *
-	 *  @return self
-	 */
-	next( granularity : string, incrementValue : number = 1 ) : DateTime {
-		if ( granularity.match( /years?/ ) ) {
-			const nextFullYear = this.dateTime.getFullYear() + Math.abs( Math.ceil( incrementValue ) );
-
-			this.dateTime.setFullYear( nextFullYear );
-		} else if ( granularity.match( /months?/ ) ) {
-			const nextMonths = this.dateTime.getMonth() + Math.abs( Math.ceil( incrementValue ) );
-
-			this.dateTime.setMonth( nextMonths );
-		} else {
-			let timestamp : number = this.dateTime.getTime();
-			let duration : ?number = this.durationOf( incrementValue, granularity );
-
-			this.dateTime = new Date( timestamp + parseInt( duration ) );
-		}
-
-		this.aggregateDateTime();
+		this.dateTime.setTime( adjustedTimestamp );
 
 		return this;
 	}
@@ -453,7 +425,10 @@ export default class DateTime {
 		if ( month > 12 ) month = 12;
 		if ( month < 1 ) month = 1;
 
-		this.dateTime.setMonth( month - 1 );
+		if ( this.dateTime.getMonth() !== month ) {
+			this.dateTime.setMonth( month - 1 );
+			this.aggregateDateBoundsTimestamps();
+		}
 
 		return this;
 	}
@@ -491,7 +466,10 @@ export default class DateTime {
 		if ( day > daysInMonth ) day = daysInMonth;
 		if ( day < 1 ) day = 1;
 
-		this.dateTime.setDate( day );
+		if ( this.dateTime.getDate() !== day ) {
+			this.dateTime.setDate( day );
+			this.aggregateDateBoundsTimestamps();
+		}
 
 		return this;
 	}
@@ -515,22 +493,25 @@ export default class DateTime {
 	}
 
 	/**
-	 *	Returns an array of date strings for current month.
+	 *	Sets timestamp from UNIX epoch time.
 	 *
-	 *	@return Array<string>
+	 *	@param number timestamp
+	 *
+	 *	@return self
 	 */
-	getDays() : Array<string> {
-		const y : number = this.getYear();
-		const m : number = this.getMonth();
-		let d : string;
+	setTimestamp( timestamp : number ) : DateTime {
+		this.dateTime.setTime( timestamp );
 
-		let daysInMonth : Array<string> = Array( this.daysInMonth ).fill('');
-		daysInMonth = daysInMonth.map( n => {
-			d = ( n + 1 ).toString().padStart( 2, '0' );
-			return `${y}-${m}-${d}T12:00:00Z`;
-		});
+		return this;
+	}
 
-		return daysInMonth;
+	/**
+	 *	Returns timestamp.
+	 *
+	 *	@return number
+	 */
+	getTimestamp() : number {
+		return +this.dateTime;
 	}
 
 	/**
@@ -591,24 +572,6 @@ export default class DateTime {
 	}
 
 	/**
-	 *	Sets current timestamp to mid-day.
-	 *
-	 *	@return self
-	 */
-	setTimeToMidday() : DateTime {
-		return this.setTime( 12, 0, 0, 0 );
-	}
-
-	/**
-	 *	Sets current timestamp to midnight.
-	 *
-	 *	@return self
-	 */
-	setTimeToMidnight() : DateTime {
-		return this.setTime( 0, 0, 0, 1 );
-	}
-
-	/**
 	 *	Converts 12h format to 24h format and sets the time accordingly.
 	 *
 	 *	@param MeridiemType meridiem
@@ -638,166 +601,133 @@ export default class DateTime {
 	}
 
 	/**
-	 *	Validates if current DateTime is between two dates.
+	 *	Sets current timestamp to mid-day.
+	 *
+	 *	@return self
+	 */
+	setTimeToMidday() : DateTime {
+		this.dateTime.setHours( 12, 0, 0, 0 );
+
+		return this;
+	}
+
+	/**
+	 *	Sets current timestamp to midnight.
+	 *
+	 *	@return self
+	 */
+	setTimeToMidnight() : DateTime {
+		this.dateTime.setHours( 0, 0, 0, 1 );
+
+		return this;
+	}
+
+	/**
+	 *	Validates if input date is before instance date.
+	 *
+	 *	@param TimeType timestamp
+	 *
+	 *	@return boolean
+	 */
+	isBefore( timestamp : TimeType ) : boolean {
+		return ( this.getTimestamp() <= timestamp );
+	}
+
+	/**
+	 *	Validates if input date is after instance date.
+	 *
+	 *	@param TimeType timestamp
+	 *
+	 *	@return boolean
+	 */
+	isAfter( timestamp : TimeType ) : boolean {
+		return ( this.getTimestamp() >= timestamp );
+	}
+
+	/**
+	 *	Validates if instance date is between start and end timestamp.
 	 *
 	 *	@param Date startDateTime
 	 *	@param Date endDateTime
 	 *
 	 *	@return boolean
 	 */
-	isBetween( startDateTime : Date , endDateTime : Date ) : boolean {
-		const startDateTimestamp : number  = startDateTime.getTime();
-		const endDateTimestamp : number  = endDateTime.getTime();
-		const currentTimestamp : number = this.dateTime.getTime();
-
-		return ( currentTimestamp >= startDateTimestamp && currentTimestamp <= endDateTimestamp );
+	isBetween( startTimestamp : TimeType, endTimestamp : TimeType ) : boolean {
+		return ( this.isAfter( startTimestamp ) && this.isBefore( endTimestamp ) );
 	}
 
 	/**
-	 *	Validates if input date is before current DateTime.
+	 *	Validates if input timestamp is within todays time bounds.
 	 *
-	 *	@param Date dateTime
+	 *	@param TimeType timestamp
 	 *
 	 *	@return boolean
 	 */
-	isBefore( dateTime : Date ) : boolean {
-		const startDateTimestamp : number = this.dateTime.getTime();
-		const endDateTimestamp : number = dateTime.getTime();
+	static isToday( timestamp : TimeType ) : boolean {
+		let { startOfDay, endOfDay } = new DateTime( new Date() );
 
-		return ( startDateTimestamp <= endDateTimestamp );
+		return ( timestamp >= startOfDay && timestamp <= endOfDay );
 	}
 
 	/**
-	 *	Validates if input date is after current DateTime.
+	 *	Validates if input timestamp is within bounds of instance date.
 	 *
-	 *	@param Date dateTime
+	 *	@param TimeType timestamp
 	 *
 	 *	@return boolean
 	 */
-	isAfter( dateTime : Date ) : boolean {
-		const startDateTimestamp : number = this.dateTime.getTime();
-		const endDateTimestamp : number = dateTime.getTime();
-
-		return ( startDateTimestamp >= endDateTimestamp );
+	sameDay( timestamp : TimeType ) : boolean {
+		return ( timestamp >= this.startOfDay && timestamp <= this.endOfDay );
 	}
 
 	/**
-	 *	Validates if input date is today.
+	 *	Returns localized representation of date, assumes instance locale variable.
 	 *
-	 *	@param Date dateTime
-	 *
-	 *	@return boolean
-	 */
-	static isToday( dateTime : Date ) : boolean {
-		const adjustedDateTime = ( new DateTime( dateTime ) ).setTime( 12, 0, 0, 0 ).toDate();
-
-		const today : Date = new Date();
-		today.setHours( 12, 0, 0, 0 );
-
-		return ( +today === +adjustedDateTime );
-	}
-
-	/**
-	 *	Validates if input date is same as instance date.
-	 *
-	 *	@param Date dateTime
-	 *
-	 *	@return boolean
-	 */
-	sameDay( dateTime : Date ) : boolean {
-		let currentDateTime = this.clone().setTimeToMidday().toDate();
-		let adjustedDateTime = ( new DateTime( dateTime ) ).setTimeToMidday().toDate();
-
-		return ( +currentDateTime === +adjustedDateTime );
-	}
-
-	/**
-	 *	Returns an array of {@see CalendarDateType}
-	 *
-	 *	@return array
-	 */
-	getCalendar() : Array<mixed> {
-		let calendar : Array<mixed> = [];
-		const weekStartsAt : number = this.weekStartsAtIndex;
-		const daysInPreviousMonth : number = ( 7 + this.startOfMonth.getDay() - weekStartsAt ) % 7;
-		const calendarWeeks : number = Math.ceil( ( this.daysInMonth + daysInPreviousMonth ) / 7 );
-		let currentDay : number = 1 - daysInPreviousMonth;
-		let weekDays : Array<CalendarDateType>;
-		let date : DateTime;
-
-		for ( let week = 0; week < calendarWeeks; week++ ) {
-			weekDays = [];
-			let dateIndex;
-
-			for ( let weekDay = 0; weekDay < 7; weekDay++ ) {
-				dateIndex = weekDay + currentDay;
-				date = this.clone().setTimeToMidday();
-				date.dateTime.setDate( dateIndex );
-
-				let sameMonth : boolean = ( dateIndex >= 1 && dateIndex <= this.daysInMonth );
-
-				weekDays.push({
-					dateTime : date,
-					isToday : DateTime.isToday( date.toDate() ),
-					sameMonth
-				});
-			}
-
-			currentDay += 7;
-			calendar.push( weekDays );
-		}
-
-		return calendar;
-	}
-
-	/**
-	 *	Returns localized calendar date (month and year).
+	 *	@param LocaleOptionsType formatOptions
 	 *
 	 *	@return string
 	 */
+	toLocaleDateString( formatOptions : Date$LocaleOptions ) : string {
+		return this.dateTime.toLocaleDateString( this.locale, formatOptions );
+	}
+
+	/**
+	 *	Returns localized representation of time, assumes instance locale variable.
+	 *
+	 *	@param LocaleOptionsType formatOptions
+	 *
+	 *	@return string
+	 */
+	toLocaleTimeString( formatOptions : Date$LocaleOptions ) : string {
+		return this.dateTime.toLocaleTimeString( this.locale, formatOptions );
+	}
+
 	toCalendarDateString() : string {
-		return this.dateTime.toLocaleDateString( this.locale, {
-			year : 'numeric',
-			month : 'long'
-		});
+		return this.toLocaleDateString({ year : 'numeric', month : 'long' });
 	}
 
-	/**
-	 *	Returns localized time string.
-	 *
-	 *	@return string
-	 */
+	toDateString() : string {
+		return this.toLocaleDateString({ year: 'numeric', month: 'numeric', day: 'numeric' });
+	}
+
+	toLongDateString() : string {
+		return this.toLocaleDateString({ weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+	}
+
 	toTimeString() : string {
-		return this.dateTime.toLocaleTimeString( this.locale, {
-			hour : '2-digit',
-			minute : '2-digit'
-		});
+		return this.toLocaleTimeString({ hour : '2-digit', minute : '2-digit', hour12 : ! this.enforce24hFormat });
 	}
 
-	/**
-	 *	Returns time in 24h format.
-	 *
-	 *	@return string
-	 */
-	to24hTimeString() : string {
-		return this.dateTime.toLocaleTimeString( this.locale, {
-			hour12 : false,
-			hour : '2-digit',
-			minute : '2-digit'
-		});
+	toLongTimeString( enforce24hFormat : boolean = false ) : string {
+		return this.toLocaleTimeString({ hour12 : ! this.enforce24hFormat });
 	}
 
-	/**
-	 *	Returns localized weekday.
-	 *
-	 *	@param string formatLength
-	 *
-	 *	@return string
-	 */
-	toWeekdayString( formatLength : string = 'long' ) : string {
-		return this.dateTime.toLocaleDateString( this.locale, {
-			weekday : formatLength
-		});
+	toWeekdayString() : string {
+		return this.toLocaleTimeString({ weekday : 'short' });
+	}
+
+	toLongWeekdayString() : string {
+		return this.toLocaleTimeString({ weekday : 'long' });
 	}
 
 	/**
@@ -807,6 +737,65 @@ export default class DateTime {
 	 */
 	toString() : string {
 		return this.dateTime.toString();
+	}
+
+}
+
+/**
+ *	@type CalendarDayType
+ */
+type CalendarDayType = {
+	isToday : boolean,
+	isCurrentMonth : boolean,
+	timestamp : number
+};
+
+/**
+ *	@type CalendarMonthType
+ */
+type CalendarMonthType = Array<CalendarDayType>;
+
+export class Calendar {
+
+	/**
+	 *	@static number weekStartsAtIndex
+	 */
+	static weekStartsAtIndex : number = 1;
+
+	/**
+	 *	Generates a multi dimensional array representing a calendar month.
+	 */
+	static generate( year : number , month : number ) : CalendarMonthType {
+		let date = new Date( year, month - 1, 1, 12, 0, 0, 0 );
+
+		let calendar : CalendarMonthType = [];
+		const daysInMonth : number = DateTime.getDaysInMonth( year, month );
+		const startOfMonthWeekday : number = date.getDay();
+		const daysInPreviousMonth : number = ( 7 + startOfMonthWeekday - Calendar.weekStartsAtIndex ) % 7;
+		const calendarWeeksInMonth : number = Math.ceil( ( daysInMonth + daysInPreviousMonth ) / 7 );
+		let currentDay : number = 1 - daysInPreviousMonth;
+
+		for ( let week : number = 0; week < calendarWeeksInMonth; week++ ) {
+			let dateIndex;
+
+			for ( let weekDay : number = 0; weekDay < 7; weekDay++ ) {
+				dateIndex = weekDay + currentDay;
+
+				let calendarDate : Date = new Date( year, month - 1, dateIndex, 12, 0, 0, 0 );
+
+				const calendarDay : CalendarDayType = {
+					isToday : DateTime.isToday( +calendarDate ),
+					isCurrentMonth : ( calendarDate.getMonth() === month - 1 ),
+					timestamp : +calendarDate
+				};
+
+				calendar.push( calendarDay );
+			}
+
+			currentDay += 7;
+		}
+
+		return calendar;
 	}
 
 }

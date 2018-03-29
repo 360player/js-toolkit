@@ -3,6 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
+exports.Calendar = undefined;
 
 var _slicedToArray2 = require('babel-runtime/helpers/slicedToArray');
 
@@ -18,8 +19,25 @@ var _createClass3 = _interopRequireDefault(_createClass2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var DEFAULT_TIMEZONE = 'Europe/Stockholm';
+
 /**
- *	Date manipulation and presentation helper class.
+ *  @const string DEFAULT_LOCALE
+ */
+var DEFAULT_LOCALE = 'en-US';
+
+/**
+ *	@type TimeType
+ */
+
+
+/**
+ *	@type TimeObjectType
+ */
+
+
+/**
+ *	@type MeridiemLocaleType
  */
 
 
@@ -29,67 +47,27 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 
 /**
- *	@type CalendarDateType
+ *	@type RoundDirectionType
+ */
+
+
+/**
+ *	@type LocaleOptionsType
+ */
+
+/**
+ *	Date manipulation and presentation helper class.
  */
 var DateTime = function () {
 
 	/**
   *  Creates a new DateTime instance.
   *
-  *  @param Date dateTime
-  *  @param bool autoResolveDefaultOptions
+  *  @param Date date
+  *	@param bool skipBoundsAggregation
+  *	@param bool autoResolveDefaultOptions
   *
   *  @return void
-  */
-
-
-	/**
-  *	@var number weekStartsAtIndex
-  */
-
-
-	/**
-  *  @var string timeZone
-  */
-
-
-	/**
-  *  @var Date startOfMonth
-  */
-
-
-	/**
-  *  @var Date startOfDay
-  */
-	function DateTime(dateTime) {
-		var autoResolveDefaultOptions = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
-		(0, _classCallCheck3.default)(this, DateTime);
-		this.timeZone = 'Europe/Stockholm';
-		this.locale = 'en-US';
-		this.weekStartsAtIndex = 1;
-		this.meridiemLocaleObject = {
-			am: 'AM',
-			pm: 'PM',
-			prefer12h: true
-		};
-
-		this.fromDate(dateTime);
-
-		if (autoResolveDefaultOptions === true) {
-			// @FLOWFIXME https://github.com/facebook/flow/issues/2801
-			var _Intl$DateTimeFormat$ = Intl.DateTimeFormat().resolvedOptions(),
-			    timeZone = _Intl$DateTimeFormat$.timeZone,
-			    locale = _Intl$DateTimeFormat$.locale;
-
-			this.setTimeZone(timeZone);
-			this.setLocale(locale);
-		}
-	}
-
-	/**
-  *	Shallow clone of current instance.
-  *
-  *	@return DateTime
   */
 
 
@@ -104,132 +82,101 @@ var DateTime = function () {
 
 
 	/**
-  *  @var Date endOfMonth
+  *  @var TimeType endOfMonth
   */
 
 
 	/**
-  *  @var Date endOfDay
+  *  @var TimeType endOfDay
   */
 
 
 	/**
   *  @var Date dateTime
   */
+	function DateTime(date) {
+		var skipBoundsAggregation = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+		var autoResolveDefaultOptions = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+		(0, _classCallCheck3.default)(this, DateTime);
+		this.timeZone = DEFAULT_TIMEZONE;
+		this.locale = DEFAULT_LOCALE;
+		this.enforce24hFormat = false;
+		this.locale = 'en-US';
+
+		this.fromDate(date, skipBoundsAggregation);
+
+		if (autoResolveDefaultOptions) {
+			this.resolveDateTimeOptions();
+		}
+	}
+
+	/**
+  *  @var string locale
+  */
+
+
+	/**
+  *	@var bool enforce24hFormat
+  */
+
+
+	/**
+  *  @var string timeZone
+  */
+
+
+	/**
+  *  @var TimeType startOfMonth
+  */
+
+
+	/**
+  *  @var TimeType startOfDay
+  */
 
 
 	(0, _createClass3.default)(DateTime, [{
-		key: 'clone',
-		value: function clone() {
-			var clonedDateTime = new DateTime(new Date(+this.dateTime));
-			clonedDateTime.setTimeZone(this.getTimeZone());
-			clonedDateTime.setLocale(this.getLocale());
-			clonedDateTime.aggregateDateTime();
+		key: 'resolveDateTimeOptions',
 
-			return clonedDateTime;
-		}
 
 		/**
-   *	Aggregates start/end-of data based on current set date.
+   *	Sets timezone and locale based on current device resolved options.
    *
    *	@return void
    */
+		value: function resolveDateTimeOptions() {
+			// @FLOWFIXME https://github.com/facebook/flow/issues/2801
+			var _Intl$DateTimeFormat$ = Intl.DateTimeFormat().resolvedOptions(),
+			    timeZone = _Intl$DateTimeFormat$.timeZone,
+			    locale = _Intl$DateTimeFormat$.locale;
 
-	}, {
-		key: 'aggregateDateTime',
-		value: function aggregateDateTime() {
-			var startOfDay = new Date(+this.dateTime);
-			startOfDay.setHours(0, 0, 0, 1);
-			this.startOfDay = startOfDay;
-
-			var endOfDay = new Date(+this.dateTime);
-			endOfDay.setHours(23, 59, 59, 999);
-			this.endOfDay = endOfDay;
-
-			var startOfMonth = new Date(+this.dateTime);
-			startOfMonth.setHours(0, 0, 0, 1);
-			startOfMonth.setDate(1);
-			this.startOfMonth = startOfMonth;
-
-			var daysInMonth = this.getDaysInMonth(this.dateTime.getMonth());
-
-			var endOfMonth = new Date(+this.dateTime);
-			endOfMonth.setHours(23, 59, 59, 999);
-			endOfMonth.setDate(daysInMonth);
-			this.endOfMonth = endOfMonth;
-
-			this.aggregateMeridiemLocaleObject();
-		}
-
-		/**
-   *	Aggregates current locale meridiem format.
-   *
-   *	@return void
-   */
-
-	}, {
-		key: 'aggregateMeridiemLocaleObject',
-		value: function aggregateMeridiemLocaleObject() {
-			var am = 'AM';
-			var pm = 'PM';
-			var prefer12h = true;
-
-			try {
-				// @FLOWFIXME https://github.com/facebook/flow/issues/2801
-				var formatter = new Intl.DateTimeFormat(this.locale, {
-					timeZone: 'UTC',
-					hour: 'numeric',
-					hour12: true
-				});
-
-				var dayPeriodFilter = function dayPeriodFilter(n) {
-					return n.type.toLowerCase() === 'dayperiod';
-				};
-
-				var amDate = new Date('1970-01-01T09:00:01Z');
-				var amParts = formatter.formatToParts(amDate).find(dayPeriodFilter);
-				am = amParts && amParts.value ? amParts.value : am;
-
-				var pmDate = new Date('1970-01-01T12:00:01Z');
-				var pmParts = formatter.formatToParts(pmDate).find(dayPeriodFilter);
-				pm = pmParts && pmParts.value ? pmParts.value : pm;
-
-				var reMeridiem = new RegExp(am + '|' + pm, 'g');
-				prefer12h = reMeridiem.test(pmDate.toLocaleTimeString(this.locale, { timeZone: 'UTC' }));
-			} catch (error) {
-				throw new Error(error);
-			}
-
-			var meridiemLocaleObject = {
-				am: am, pm: pm, prefer12h: prefer12h
-			};
-
-			this.meridiemLocaleObject = meridiemLocaleObject;
+			this.setTimeZone(timeZone);
+			this.setLocale(locale);
 		}
 
 		/**
    *  Sets current date time object.
    *
    *  @param Date dateTime
+   *	@param boolean skipBoundsAggregation
    *
    *  @return void
    */
 
 	}, {
 		key: 'fromDate',
-		value: function fromDate() {
-			var dateTime = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-
-			if (!dateTime) {
-				dateTime = new Date();
-			}
+		value: function fromDate(dateTime) {
+			var skipBoundsAggregation = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
 			if (dateTime instanceof Date === false) {
 				throw new Error('Must be instance of Date');
 			}
 
 			this.dateTime = dateTime;
-			this.aggregateDateTime();
+
+			if (!skipBoundsAggregation) {
+				this.aggregateDateBoundsTimestamps();
+			}
 		}
 
 		/**
@@ -282,7 +229,6 @@ var DateTime = function () {
 		key: 'setLocale',
 		value: function setLocale(locale) {
 			this.locale = locale;
-			this.aggregateMeridiemLocaleObject();
 		}
 
 		/**
@@ -302,32 +248,108 @@ var DateTime = function () {
    */
 
 	}, {
-		key: 'getDaysInMonth',
+		key: 'aggregateStartAndEndOfDay',
 
 
 		/**
-   *  Returns the number of days in input month.
+   *	Calculates and sets start and end of day from input date.
    *
-   *  @param number monthOffset
+   *	@param Date date
    *
-   *  @return number
+   *	@return void
    */
-		value: function getDaysInMonth(monthOffset) {
-			var daysInMonths = [31, this.isLeapYear ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+		value: function aggregateStartAndEndOfDay(date) {
+			// @NOTE Get start of current date as timestamp
+			date.setHours(0, 0, 0, 0);
+			this.startOfDay = +date;
 
-			if (monthOffset > 11) monthOffset = 11;
-			if (monthOffset < 0) monthOffset = 0;
-
-			return daysInMonths[monthOffset];
+			// @NOTE Get end of current date as timestamp
+			date.setHours(23, 59, 59, 999);
+			this.endOfDay = +date;
 		}
 
 		/**
-   *  @prop number daysInMonth
+   *	Calculates and sets start and end of month from input date.
+   *
+   *	@param Date date
+   *
+   *	@return void
    */
 
 	}, {
-		key: 'durationOf',
+		key: 'aggregateStartAndEndOfMonth',
+		value: function aggregateStartAndEndOfMonth(date) {
+			// @NOTE Get start of current month as timestamp
+			date.setHours(0, 0, 0, 0);
+			date.setDate(1);
+			this.startOfMonth = +date;
 
+			// @NOTE Get end of current month as timestamp
+			date.setHours(23, 59, 59, 999);
+			date.setDate(DateTime.getDaysInMonth(date.getFullYear(), date.getMonth() + 1));
+			this.endOfMonth = +date;
+		}
+
+		/**
+   *	Calculates start of, and end of day and month based on instance date.
+   *
+   *	@return void
+   */
+
+	}, {
+		key: 'aggregateDateBoundsTimestamps',
+		value: function aggregateDateBoundsTimestamps() {
+			var date = new Date(+this.dateTime);
+
+			this.aggregateStartAndEndOfDay(date);
+			this.aggregateStartAndEndOfMonth(date);
+		}
+
+		/**
+   *	Aggregates current locale meridiem format.
+   *
+   *	@return void
+   */
+
+	}, {
+		key: 'aggregateMeridiemLocaleObject',
+		value: function aggregateMeridiemLocaleObject() {
+			var am = 'AM';
+			var pm = 'PM';
+			var prefer12h = true;
+			var date = new Date('1970-01-01T09:00:01Z');
+
+			try {
+				// @FLOWFIXME https://github.com/facebook/flow/issues/2801
+				var formatter = new Intl.DateTimeFormat(this.locale, {
+					timeZone: 'UTC',
+					hour: 'numeric',
+					hour12: true
+				});
+
+				var dayPeriodFilter = function dayPeriodFilter(n) {
+					return n.type.toLowerCase() === 'dayperiod';
+				};
+
+				var amParts = formatter.formatToParts(date).find(dayPeriodFilter);
+				am = amParts && amParts.value ? amParts.value : am;
+
+				date.setHours(12, 0, 0, 1);
+				var pmParts = formatter.formatToParts(date).find(dayPeriodFilter);
+				pm = pmParts && pmParts.value ? pmParts.value : pm;
+
+				var reMeridiem = new RegExp(am + '|' + pm, 'g');
+				prefer12h = reMeridiem.test(date.toLocaleTimeString(this.locale, { timeZone: 'UTC' }));
+			} catch (error) {
+				throw new Error(error);
+			}
+
+			var meridiemLocaleObject = {
+				am: am, pm: pm, prefer12h: prefer12h
+			};
+
+			this.meridiemLocaleObject = meridiemLocaleObject;
+		}
 
 		/**
    *  Returns the duration of a granularity of time, such as seconds, minutes up to weeks.
@@ -337,6 +359,9 @@ var DateTime = function () {
    *
    *  @return number
    */
+
+	}, {
+		key: 'durationOf',
 		value: function durationOf(value, granularity) {
 			var granularities = {
 				millisecond: 1,
@@ -390,75 +415,11 @@ var DateTime = function () {
 
 			var adjustedTimestamp = roundBy(timestamp / duration) * duration;
 
-			this.fromDate(new Date(adjustedTimestamp));
-
-			return this;
-		}
-
-		/**
-   *  Decrements nth granularity from date time.
-   *
-   *  @param string granularity
-   *  @param number decrementValue
-   *
-   *  @return self
-   */
-
-	}, {
-		key: 'prev',
-		value: function prev(granularity) {
-			var decrementValue = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
-
-			if (granularity.match(/years?/)) {
-				var prevFullYear = this.dateTime.getFullYear() - Math.abs(Math.ceil(decrementValue));
-
-				this.dateTime.setFullYear(prevFullYear);
-			} else if (granularity.match(/months?/)) {
-				var prevMonths = this.dateTime.getMonth() - Math.abs(Math.ceil(decrementValue));
-
-				this.dateTime.setMonth(prevMonths);
-			} else {
-				var timestamp = this.dateTime.getTime();
-				var duration = this.durationOf(decrementValue, granularity);
-
-				this.dateTime = new Date(Math.abs(timestamp - parseInt(duration)));
+			if (adjustedTimestamp > this.endOfDay) {
+				adjustedTimestamp = this.endOfDay;
 			}
 
-			this.aggregateDateTime();
-
-			return this;
-		}
-
-		/**
-   *  Increments nth granularity to date time.
-   *
-   *  @param string granularity
-   *  @param number incrementValue
-   *
-   *  @return self
-   */
-
-	}, {
-		key: 'next',
-		value: function next(granularity) {
-			var incrementValue = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
-
-			if (granularity.match(/years?/)) {
-				var nextFullYear = this.dateTime.getFullYear() + Math.abs(Math.ceil(incrementValue));
-
-				this.dateTime.setFullYear(nextFullYear);
-			} else if (granularity.match(/months?/)) {
-				var nextMonths = this.dateTime.getMonth() + Math.abs(Math.ceil(incrementValue));
-
-				this.dateTime.setMonth(nextMonths);
-			} else {
-				var timestamp = this.dateTime.getTime();
-				var duration = this.durationOf(incrementValue, granularity);
-
-				this.dateTime = new Date(timestamp + parseInt(duration));
-			}
-
-			this.aggregateDateTime();
+			this.dateTime.setTime(adjustedTimestamp);
 
 			return this;
 		}
@@ -507,7 +468,10 @@ var DateTime = function () {
 			if (month > 12) month = 12;
 			if (month < 1) month = 1;
 
-			this.dateTime.setMonth(month - 1);
+			if (this.dateTime.getMonth() !== month) {
+				this.dateTime.setMonth(month - 1);
+				this.aggregateDateBoundsTimestamps();
+			}
 
 			return this;
 		}
@@ -555,7 +519,10 @@ var DateTime = function () {
 			if (day > daysInMonth) day = daysInMonth;
 			if (day < 1) day = 1;
 
-			this.dateTime.setDate(day);
+			if (this.dateTime.getDate() !== day) {
+				this.dateTime.setDate(day);
+				this.aggregateDateBoundsTimestamps();
+			}
 
 			return this;
 		}
@@ -585,25 +552,31 @@ var DateTime = function () {
 		}
 
 		/**
-   *	Returns an array of date strings for current month.
+   *	Sets timestamp from UNIX epoch time.
    *
-   *	@return Array<string>
+   *	@param number timestamp
+   *
+   *	@return self
    */
 
 	}, {
-		key: 'getDays',
-		value: function getDays() {
-			var y = this.getYear();
-			var m = this.getMonth();
-			var d = void 0;
+		key: 'setTimestamp',
+		value: function setTimestamp(timestamp) {
+			this.dateTime.setTime(timestamp);
 
-			var daysInMonth = Array(this.daysInMonth).fill('');
-			daysInMonth = daysInMonth.map(function (n) {
-				d = (n + 1).toString().padStart(2, '0');
-				return y + '-' + m + '-' + d + 'T12:00:00Z';
-			});
+			return this;
+		}
 
-			return daysInMonth;
+		/**
+   *	Returns timestamp.
+   *
+   *	@return number
+   */
+
+	}, {
+		key: 'getTimestamp',
+		value: function getTimestamp() {
+			return +this.dateTime;
 		}
 
 		/**
@@ -675,30 +648,6 @@ var DateTime = function () {
 		}
 
 		/**
-   *	Sets current timestamp to mid-day.
-   *
-   *	@return self
-   */
-
-	}, {
-		key: 'setTimeToMidday',
-		value: function setTimeToMidday() {
-			return this.setTime(12, 0, 0, 0);
-		}
-
-		/**
-   *	Sets current timestamp to midnight.
-   *
-   *	@return self
-   */
-
-	}, {
-		key: 'setTimeToMidnight',
-		value: function setTimeToMidnight() {
-			return this.setTime(0, 0, 0, 1);
-		}
-
-		/**
    *	Converts 12h format to 24h format and sets the time accordingly.
    *
    *	@param MeridiemType meridiem
@@ -736,7 +685,63 @@ var DateTime = function () {
 		}
 
 		/**
-   *	Validates if current DateTime is between two dates.
+   *	Sets current timestamp to mid-day.
+   *
+   *	@return self
+   */
+
+	}, {
+		key: 'setTimeToMidday',
+		value: function setTimeToMidday() {
+			this.dateTime.setHours(12, 0, 0, 0);
+
+			return this;
+		}
+
+		/**
+   *	Sets current timestamp to midnight.
+   *
+   *	@return self
+   */
+
+	}, {
+		key: 'setTimeToMidnight',
+		value: function setTimeToMidnight() {
+			this.dateTime.setHours(0, 0, 0, 1);
+
+			return this;
+		}
+
+		/**
+   *	Validates if input date is before instance date.
+   *
+   *	@param TimeType timestamp
+   *
+   *	@return boolean
+   */
+
+	}, {
+		key: 'isBefore',
+		value: function isBefore(timestamp) {
+			return this.getTimestamp() <= timestamp;
+		}
+
+		/**
+   *	Validates if input date is after instance date.
+   *
+   *	@param TimeType timestamp
+   *
+   *	@return boolean
+   */
+
+	}, {
+		key: 'isAfter',
+		value: function isAfter(timestamp) {
+			return this.getTimestamp() >= timestamp;
+		}
+
+		/**
+   *	Validates if instance date is between start and end timestamp.
    *
    *	@param Date startDateTime
    *	@param Date endDateTime
@@ -746,52 +751,14 @@ var DateTime = function () {
 
 	}, {
 		key: 'isBetween',
-		value: function isBetween(startDateTime, endDateTime) {
-			var startDateTimestamp = startDateTime.getTime();
-			var endDateTimestamp = endDateTime.getTime();
-			var currentTimestamp = this.dateTime.getTime();
-
-			return currentTimestamp >= startDateTimestamp && currentTimestamp <= endDateTimestamp;
+		value: function isBetween(startTimestamp, endTimestamp) {
+			return this.isAfter(startTimestamp) && this.isBefore(endTimestamp);
 		}
 
 		/**
-   *	Validates if input date is before current DateTime.
+   *	Validates if input timestamp is within todays time bounds.
    *
-   *	@param Date dateTime
-   *
-   *	@return boolean
-   */
-
-	}, {
-		key: 'isBefore',
-		value: function isBefore(dateTime) {
-			var startDateTimestamp = this.dateTime.getTime();
-			var endDateTimestamp = dateTime.getTime();
-
-			return startDateTimestamp <= endDateTimestamp;
-		}
-
-		/**
-   *	Validates if input date is after current DateTime.
-   *
-   *	@param Date dateTime
-   *
-   *	@return boolean
-   */
-
-	}, {
-		key: 'isAfter',
-		value: function isAfter(dateTime) {
-			var startDateTimestamp = this.dateTime.getTime();
-			var endDateTimestamp = dateTime.getTime();
-
-			return startDateTimestamp >= endDateTimestamp;
-		}
-
-		/**
-   *	Validates if input date is today.
-   *
-   *	@param Date dateTime
+   *	@param TimeType timestamp
    *
    *	@return boolean
    */
@@ -801,123 +768,79 @@ var DateTime = function () {
 
 
 		/**
-   *	Validates if input date is same as instance date.
+   *	Validates if input timestamp is within bounds of instance date.
    *
-   *	@param Date dateTime
+   *	@param TimeType timestamp
    *
    *	@return boolean
    */
-		value: function sameDay(dateTime) {
-			var currentDateTime = this.clone().setTimeToMidday().toDate();
-			var adjustedDateTime = new DateTime(dateTime).setTimeToMidday().toDate();
-
-			return +currentDateTime === +adjustedDateTime;
+		value: function sameDay(timestamp) {
+			return timestamp >= this.startOfDay && timestamp <= this.endOfDay;
 		}
 
 		/**
-   *	Returns an array of {@see CalendarDateType}
+   *	Returns localized representation of date, assumes instance locale variable.
    *
-   *	@return array
-   */
-
-	}, {
-		key: 'getCalendar',
-		value: function getCalendar() {
-			var calendar = [];
-			var weekStartsAt = this.weekStartsAtIndex;
-			var daysInPreviousMonth = (7 + this.startOfMonth.getDay() - weekStartsAt) % 7;
-			var calendarWeeks = Math.ceil((this.daysInMonth + daysInPreviousMonth) / 7);
-			var currentDay = 1 - daysInPreviousMonth;
-			var weekDays = void 0;
-			var date = void 0;
-
-			for (var week = 0; week < calendarWeeks; week++) {
-				weekDays = [];
-				var dateIndex = void 0;
-
-				for (var weekDay = 0; weekDay < 7; weekDay++) {
-					dateIndex = weekDay + currentDay;
-					date = this.clone().setTimeToMidday();
-					date.dateTime.setDate(dateIndex);
-
-					var _sameMonth = dateIndex >= 1 && dateIndex <= this.daysInMonth;
-
-					weekDays.push({
-						dateTime: date,
-						isToday: DateTime.isToday(date.toDate()),
-						sameMonth: _sameMonth
-					});
-				}
-
-				currentDay += 7;
-				calendar.push(weekDays);
-			}
-
-			return calendar;
-		}
-
-		/**
-   *	Returns localized calendar date (month and year).
+   *	@param LocaleOptionsType formatOptions
    *
    *	@return string
    */
 
+	}, {
+		key: 'toLocaleDateString',
+		value: function toLocaleDateString(formatOptions) {
+			return this.dateTime.toLocaleDateString(this.locale, formatOptions);
+		}
+
+		/**
+   *	Returns localized representation of time, assumes instance locale variable.
+   *
+   *	@param LocaleOptionsType formatOptions
+   *
+   *	@return string
+   */
+
+	}, {
+		key: 'toLocaleTimeString',
+		value: function toLocaleTimeString(formatOptions) {
+			return this.dateTime.toLocaleTimeString(this.locale, formatOptions);
+		}
 	}, {
 		key: 'toCalendarDateString',
 		value: function toCalendarDateString() {
-			return this.dateTime.toLocaleDateString(this.locale, {
-				year: 'numeric',
-				month: 'long'
-			});
+			return this.toLocaleDateString({ year: 'numeric', month: 'long' });
 		}
-
-		/**
-   *	Returns localized time string.
-   *
-   *	@return string
-   */
-
+	}, {
+		key: 'toDateString',
+		value: function toDateString() {
+			return this.toLocaleDateString({ year: 'numeric', month: 'numeric', day: 'numeric' });
+		}
+	}, {
+		key: 'toLongDateString',
+		value: function toLongDateString() {
+			return this.toLocaleDateString({ weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+		}
 	}, {
 		key: 'toTimeString',
 		value: function toTimeString() {
-			return this.dateTime.toLocaleTimeString(this.locale, {
-				hour: '2-digit',
-				minute: '2-digit'
-			});
+			return this.toLocaleTimeString({ hour: '2-digit', minute: '2-digit', hour12: !this.enforce24hFormat });
 		}
-
-		/**
-   *	Returns time in 24h format.
-   *
-   *	@return string
-   */
-
 	}, {
-		key: 'to24hTimeString',
-		value: function to24hTimeString() {
-			return this.dateTime.toLocaleTimeString(this.locale, {
-				hour12: false,
-				hour: '2-digit',
-				minute: '2-digit'
-			});
+		key: 'toLongTimeString',
+		value: function toLongTimeString() {
+			var enforce24hFormat = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
+			return this.toLocaleTimeString({ hour12: !this.enforce24hFormat });
 		}
-
-		/**
-   *	Returns localized weekday.
-   *
-   *	@param string formatLength
-   *
-   *	@return string
-   */
-
 	}, {
 		key: 'toWeekdayString',
 		value: function toWeekdayString() {
-			var formatLength = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'long';
-
-			return this.dateTime.toLocaleDateString(this.locale, {
-				weekday: formatLength
-			});
+			return this.toLocaleTimeString({ weekday: 'short' });
+		}
+	}, {
+		key: 'toLongWeekdayString',
+		value: function toLongWeekdayString() {
+			return this.toLocaleTimeString({ weekday: 'long' });
 		}
 
 		/**
@@ -932,54 +855,126 @@ var DateTime = function () {
 			return this.dateTime.toString();
 		}
 	}, {
-		key: 'isLeapYear',
-		get: function get() {
-			var year = this.dateTime.getFullYear();
+		key: 'daysInMonth',
 
+
+		/**
+   *  @prop number daysInMonth
+   */
+		get: function get() {
+			return DateTime.getDaysInMonth(this.dateTime.getFullYear(), this.dateTime.getMonth());
+		}
+	}], [{
+		key: 'isLeapYear',
+		value: function isLeapYear(year) {
 			return year % 4 === 0 && year % 100 !== 0 || year % 400 === 0;
 		}
 
 		/**
-   *  @prop number daysInYear
+   *  Returns number of days in current year
    */
 
 	}, {
 		key: 'daysInYear',
-		get: function get() {
-			return this.isLeapYear ? 366 : 365;
+		value: function daysInYear(year) {
+			return DateTime.isLeapYear(year) ? 366 : 365;
+		}
+
+		/**
+   *  Returns the number of days in input month.
+   *
+   *	@param number year
+   *  @param number month
+   *
+   *  @return number
+   */
+
+	}, {
+		key: 'getDaysInMonth',
+		value: function getDaysInMonth(year, month) {
+			var daysInMonths = [31, DateTime.isLeapYear(year) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+			var monthOffset = month - 1;
+			if (monthOffset > 11) monthOffset = 11;
+			if (monthOffset < 0) monthOffset = 0;
+
+			return daysInMonths[monthOffset];
 		}
 	}, {
-		key: 'daysInMonth',
-		get: function get() {
-			return this.getDaysInMonth(this.dateTime.getMonth());
-		}
-	}], [{
 		key: 'isToday',
-		value: function isToday(dateTime) {
-			var adjustedDateTime = new DateTime(dateTime).setTime(12, 0, 0, 0).toDate();
+		value: function isToday(timestamp) {
+			var _ref3 = new DateTime(new Date()),
+			    startOfDay = _ref3.startOfDay,
+			    endOfDay = _ref3.endOfDay;
 
-			var today = new Date();
-			today.setHours(12, 0, 0, 0);
-
-			return +today === +adjustedDateTime;
+			return timestamp >= startOfDay && timestamp <= endOfDay;
 		}
 	}]);
 	return DateTime;
 }();
 
 /**
- *	@type RoundDirectionType
- */
-
-
-/**
- *	@type MeridiemLocaleType
- */
-
-
-/**
- *	@type TimeObjectType
+ *	@type CalendarDayType
  */
 
 
 exports.default = DateTime;
+
+/**
+ *	@type CalendarMonthType
+ */
+
+var Calendar = exports.Calendar = function () {
+	function Calendar() {
+		(0, _classCallCheck3.default)(this, Calendar);
+	}
+
+	(0, _createClass3.default)(Calendar, null, [{
+		key: 'generate',
+
+
+		/**
+   *	Generates a multi dimensional array representing a calendar month.
+   */
+		value: function generate(year, month) {
+			var date = new Date(year, month - 1, 1, 12, 0, 0, 0);
+
+			var calendar = [];
+			var daysInMonth = DateTime.getDaysInMonth(year, month);
+			var startOfMonthWeekday = date.getDay();
+			var daysInPreviousMonth = (7 + startOfMonthWeekday - Calendar.weekStartsAtIndex) % 7;
+			var calendarWeeksInMonth = Math.ceil((daysInMonth + daysInPreviousMonth) / 7);
+			var currentDay = 1 - daysInPreviousMonth;
+
+			for (var week = 0; week < calendarWeeksInMonth; week++) {
+				var dateIndex = void 0;
+
+				for (var weekDay = 0; weekDay < 7; weekDay++) {
+					dateIndex = weekDay + currentDay;
+
+					var calendarDate = new Date(year, month - 1, dateIndex, 12, 0, 0, 0);
+
+					var calendarDay = {
+						isToday: DateTime.isToday(+calendarDate),
+						isCurrentMonth: calendarDate.getMonth() === month - 1,
+						timestamp: +calendarDate
+					};
+
+					calendar.push(calendarDay);
+				}
+
+				currentDay += 7;
+			}
+
+			return calendar;
+		}
+
+		/**
+   *	@static number weekStartsAtIndex
+   */
+
+	}]);
+	return Calendar;
+}();
+
+Calendar.weekStartsAtIndex = 1;
