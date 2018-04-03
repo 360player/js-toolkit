@@ -641,7 +641,7 @@ export default class DateTime {
 		const milliSecond : number = this.dateTime.getMilliseconds();
 		const meridiem = ( hour <= 12 ) ? 'am' : 'pm';
 
-		if ( meridiem === 'am' && hour > 12 ) {
+		if ( hour > 12 ) {
 			hour -= 12;
 		}
 

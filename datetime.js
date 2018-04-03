@@ -717,7 +717,7 @@ var DateTime = function () {
 			var milliSecond = this.dateTime.getMilliseconds();
 			var meridiem = hour <= 12 ? 'am' : 'pm';
 
-			if (meridiem === 'am' && hour > 12) {
+			if (hour > 12) {
 				hour -= 12;
 			}
 
