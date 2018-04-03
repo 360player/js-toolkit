@@ -641,13 +641,33 @@ export default class DateTime {
 	 */
 	mergeTime( date : Date ) {
 		const h : number = date.getHours();
-		const m : number = date.getHours();
+		const m : number = date.getMinutes();
 		const s : number = date.getSeconds();
 		const ms : number = date.getMilliseconds();
 
 		this.setTime( h, m, s, ms );
 
 		this.aggregateMeridiemLocaleObject();
+	}
+
+	/**
+	 *	Sets date from UNIX timestamp.
+	 *
+	 *	@param number unixTimestamp
+	 *
+	 *	@return self
+	 */
+	setUnixTimestamp( unixTimestamp : number ) : DateTime {
+		return this.setTimestamp( unixTimestamp * 1000 );
+	}
+
+	/**
+	 *	Returns UNIX timestamp.
+	 *
+	 *	@return number
+	 */
+	getUnixTimestamp() : number {
+		return this.getTimestamp() / 1000;
 	}
 
 	/**

@@ -737,13 +737,39 @@ var DateTime = function () {
 		key: 'mergeTime',
 		value: function mergeTime(date) {
 			var h = date.getHours();
-			var m = date.getHours();
+			var m = date.getMinutes();
 			var s = date.getSeconds();
 			var ms = date.getMilliseconds();
 
 			this.setTime(h, m, s, ms);
 
 			this.aggregateMeridiemLocaleObject();
+		}
+
+		/**
+   *	Sets date from UNIX timestamp.
+   *
+   *	@param number unixTimestamp
+   *
+   *	@return self
+   */
+
+	}, {
+		key: 'setUnixTimestamp',
+		value: function setUnixTimestamp(unixTimestamp) {
+			return this.setTimestamp(unixTimestamp * 1000);
+		}
+
+		/**
+   *	Returns UNIX timestamp.
+   *
+   *	@return number
+   */
+
+	}, {
+		key: 'getUnixTimestamp',
+		value: function getUnixTimestamp() {
+			return this.getTimestamp() / 1000;
 		}
 
 		/**
