@@ -22,7 +22,8 @@ type TimeObjectType = {
 	hour : number,
 	minute : number,
 	second : number,
-	milliSecond : number
+	milliSecond : number,
+	meridiem? : string
 };
 
 /**
@@ -534,7 +535,7 @@ export default class DateTime {
 	 *
 	 *	@return self
 	 */
-	setTime( hour : number = 0, minute : number = 0, second : number = 0, milliSecond : number = 0 ) : DateTime {
+	setTime( hour : number, minute : number = -1, second : number = -1, milliSecond : number = -1 ) : DateTime {
 		let dateTime = this.dateTime;
 
 		if ( hour > 23 || hour < 0 ) {
@@ -582,6 +583,24 @@ export default class DateTime {
 	}
 
 	/**
+	 *	Returns true if time is AM.
+	 *
+	 *	@return boolean
+	 */
+	get isAnteMeridiem() : boolean {
+		return this.getTime().hour <= 12;
+	}
+
+	/**
+	 *	Returns true if time is PM.
+	 *
+	 *	@return boolean
+	 */
+	get isPostMeridiem() : boolean {
+		return this.getTime().hour > 12;
+	}
+
+	/**
 	 *	Converts 12h format to 24h format and sets the time accordingly.
 	 *
 	 *	@param MeridiemType meridiem
@@ -592,7 +611,7 @@ export default class DateTime {
 	 *
 	 *	@return self
 	 */
-	setTimeFrom12hFormat( meridiem : MeridiemType, hour : number = 0, minute : number = 0, second : number = 0, milliSecond : number = 0 ) : DateTime {
+	setTime12h( meridiem : MeridiemType, hour : number, minute : number = -1, second : number = -1, milliSecond : number = -1 ) : DateTime {
 		const isValidMeridiem : boolean = [ 'am', 'pm' ].includes( meridiem );
 
 		if ( ! isValidMeridiem ) {
@@ -608,6 +627,33 @@ export default class DateTime {
 		}
 
 		return this.setTime( hour, minute, second, milliSecond );
+	}
+
+	/**
+	 *	Returns {@see TimeObjectType} for current timestamp in 12h format.
+	 *
+	 *	@return TimeObjectType
+	 */
+	getTime12h() : TimeObjectType {
+		let hour : number = this.dateTime.getHours();
+		const minute : number = this.dateTime.getMinutes();
+		const second : number = this.dateTime.getSeconds();
+		const milliSecond : number = this.dateTime.getMilliseconds();
+		const meridiem = ( hour <= 12 ) ? 'am' : 'pm';
+
+		if ( meridiem === 'am' && hour > 12 ) {
+			hour -= 12;
+		}
+
+		const timeObject : TimeObjectType = {
+			hour,
+			minute,
+			second,
+			milliSecond,
+			meridiem
+		};
+
+		return timeObject;
 	}
 
 	/**

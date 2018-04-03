@@ -605,11 +605,10 @@ var DateTime = function () {
 
 	}, {
 		key: 'setTime',
-		value: function setTime() {
-			var hour = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
-			var minute = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-			var second = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
-			var milliSecond = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
+		value: function setTime(hour) {
+			var minute = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : -1;
+			var second = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : -1;
+			var milliSecond = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : -1;
 
 			var dateTime = this.dateTime;
 
@@ -661,6 +660,16 @@ var DateTime = function () {
 		}
 
 		/**
+   *	Returns true if time is AM.
+   *
+   *	@return boolean
+   */
+
+	}, {
+		key: 'setTime12h',
+
+
+		/**
    *	Converts 12h format to 24h format and sets the time accordingly.
    *
    *	@param MeridiemType meridiem
@@ -671,14 +680,10 @@ var DateTime = function () {
    *
    *	@return self
    */
-
-	}, {
-		key: 'setTimeFrom12hFormat',
-		value: function setTimeFrom12hFormat(meridiem) {
-			var hour = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-			var minute = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
-			var second = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
-			var milliSecond = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 0;
+		value: function setTime12h(meridiem, hour) {
+			var minute = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : -1;
+			var second = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : -1;
+			var milliSecond = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : -1;
 
 			var isValidMeridiem = ['am', 'pm'].includes(meridiem);
 
@@ -695,6 +700,36 @@ var DateTime = function () {
 			}
 
 			return this.setTime(hour, minute, second, milliSecond);
+		}
+
+		/**
+   *	Returns {@see TimeObjectType} for current timestamp in 12h format.
+   *
+   *	@return TimeObjectType
+   */
+
+	}, {
+		key: 'getTime12h',
+		value: function getTime12h() {
+			var hour = this.dateTime.getHours();
+			var minute = this.dateTime.getMinutes();
+			var second = this.dateTime.getSeconds();
+			var milliSecond = this.dateTime.getMilliseconds();
+			var meridiem = hour <= 12 ? 'am' : 'pm';
+
+			if (meridiem === 'am' && hour > 12) {
+				hour -= 12;
+			}
+
+			var timeObject = {
+				hour: hour,
+				minute: minute,
+				second: second,
+				milliSecond: milliSecond,
+				meridiem: meridiem
+			};
+
+			return timeObject;
 		}
 
 		/**
@@ -991,6 +1026,23 @@ var DateTime = function () {
    */
 		get: function get() {
 			return DateTime.getDaysInMonth(this.dateTime.getFullYear(), this.dateTime.getMonth());
+		}
+	}, {
+		key: 'isAnteMeridiem',
+		get: function get() {
+			return this.getTime().hour <= 12;
+		}
+
+		/**
+   *	Returns true if time is PM.
+   *
+   *	@return boolean
+   */
+
+	}, {
+		key: 'isPostMeridiem',
+		get: function get() {
+			return this.getTime().hour > 12;
 		}
 	}], [{
 		key: 'isLeapYear',
