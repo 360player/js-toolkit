@@ -192,6 +192,28 @@ var DateTime = function () {
 		}
 
 		/**
+   *	Merges date (year, month and date), to merge time use {@see mergeTime} or to change full date use {@see setDate}.
+   *
+   *	@param Date date
+   *
+   *	@return void
+   */
+
+	}, {
+		key: 'mergeDate',
+		value: function mergeDate(date) {
+			var y = date.getFullYear();
+			var m = date.getMonth() + 1;
+			var d = date.getDate();
+
+			this.setYear(y);
+			this.setMonth(m);
+			this.setDay(d);
+
+			this.aggregateDateBoundsTimestamps();
+		}
+
+		/**
    *  Sets current time zone.
    *
    *  @param string timeZone
@@ -701,6 +723,27 @@ var DateTime = function () {
 			this.dateTime.setHours(0, 0, 0, 1);
 
 			return this;
+		}
+
+		/**
+   *	Merges time, to merge date use {@see mergeDate} or to change full date use {@see setDate}.
+   *
+   *	@param Date date
+   *
+   *	@return void
+   */
+
+	}, {
+		key: 'mergeTime',
+		value: function mergeTime(date) {
+			var h = date.getHours();
+			var m = date.getHours();
+			var s = date.getSeconds();
+			var ms = date.getMilliseconds();
+
+			this.setTime(h, m, s, ms);
+
+			this.aggregateMeridiemLocaleObject();
 		}
 
 		/**

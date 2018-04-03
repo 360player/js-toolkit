@@ -164,6 +164,25 @@ export default class DateTime {
 	}
 
 	/**
+	 *	Merges date (year, month and date), to merge time use {@see mergeTime} or to change full date use {@see setDate}.
+	 *
+	 *	@param Date date
+	 *
+	 *	@return void
+	 */
+	mergeDate( date : Date ) {
+		const y : number = date.getFullYear();
+		const m : number = date.getMonth() + 1;
+		const d : number = date.getDate();
+
+		this.setYear( y );
+		this.setMonth( m );
+		this.setDay( d );
+
+		this.aggregateDateBoundsTimestamps();
+	}
+
+	/**
 	 *  Sets current time zone.
 	 *
 	 *  @param string timeZone
@@ -611,6 +630,24 @@ export default class DateTime {
 		this.dateTime.setHours( 0, 0, 0, 1 );
 
 		return this;
+	}
+
+	/**
+	 *	Merges time, to merge date use {@see mergeDate} or to change full date use {@see setDate}.
+	 *
+	 *	@param Date date
+	 *
+	 *	@return void
+	 */
+	mergeTime( date : Date ) {
+		const h : number = date.getHours();
+		const m : number = date.getHours();
+		const s : number = date.getSeconds();
+		const ms : number = date.getMilliseconds();
+
+		this.setTime( h, m, s, ms );
+
+		this.aggregateMeridiemLocaleObject();
 	}
 
 	/**
