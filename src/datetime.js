@@ -588,7 +588,7 @@ export default class DateTime {
 	 *	@return boolean
 	 */
 	get isAnteMeridiem() : boolean {
-		return this.getTime().hour <= 12;
+		return ! this.isPostMeridiem;
 	}
 
 	/**
@@ -597,7 +597,8 @@ export default class DateTime {
 	 *	@return boolean
 	 */
 	get isPostMeridiem() : boolean {
-		return this.getTime().hour > 12;
+		const { hour, minute, second, milliSecond } = this.getTime();
+		return ( hour >= 12 && minute >= 0 && second >= 0 && milliSecond > 0 );
 	}
 
 	/**

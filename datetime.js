@@ -1030,7 +1030,7 @@ var DateTime = function () {
 	}, {
 		key: 'isAnteMeridiem',
 		get: function get() {
-			return this.getTime().hour <= 12;
+			return !this.isPostMeridiem;
 		}
 
 		/**
@@ -1042,7 +1042,13 @@ var DateTime = function () {
 	}, {
 		key: 'isPostMeridiem',
 		get: function get() {
-			return this.getTime().hour > 12;
+			var _getTime = this.getTime(),
+			    hour = _getTime.hour,
+			    minute = _getTime.minute,
+			    second = _getTime.second,
+			    milliSecond = _getTime.milliSecond;
+
+			return hour >= 12 && minute >= 0 && second >= 0 && milliSecond > 0;
 		}
 	}], [{
 		key: 'isLeapYear',
