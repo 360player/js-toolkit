@@ -619,11 +619,7 @@ export default class DateTime {
 			throw new Error( `Invalid meridiem format, expected "am" or "pm", received "${meridiem}".` );
 		}
 
-		hour = ( hour > 24 ) ? 24 : hour;
-
-		if ( meridiem === 'am' && hour > 12 ) {
-			hour -= 12;
-		} else if ( meridiem === 'pm' && hour <= 12 ) {
+		if ( meridiem === 'pm' ) {
 			hour += 12;
 		}
 
@@ -640,7 +636,7 @@ export default class DateTime {
 		const minute : number = this.dateTime.getMinutes();
 		const second : number = this.dateTime.getSeconds();
 		const milliSecond : number = this.dateTime.getMilliseconds();
-		const meridiem = ( hour <= 12 ) ? 'am' : 'pm';
+		const meridiem = ( hour >= 12 && minute >= 0 && second >= 0 && milliSecond > 0 ) ? 'pm' : 'am';
 
 		if ( hour > 12 ) {
 			hour -= 12;
