@@ -101,9 +101,8 @@ var DateTime = function () {
 		this.timeZone = DEFAULT_TIMEZONE;
 		this.locale = DEFAULT_LOCALE;
 		this.enforce24hFormat = false;
-		this.locale = 'en-US';
 
-		this.fromDate(date, skipBoundsAggregation);
+		this.fromDate(date || new Date(), skipBoundsAggregation);
 
 		if (autoResolveDefaultOptions) {
 			this.resolveDateTimeOptions();
@@ -111,7 +110,9 @@ var DateTime = function () {
 	}
 
 	/**
-  *  @var string locale
+  *	Returns a new instance of DateTime set to current date.
+  *
+  *	@return DateTime
   */
 
 
@@ -800,7 +801,7 @@ var DateTime = function () {
 	}, {
 		key: 'getUnixTimestamp',
 		value: function getUnixTimestamp() {
-			return this.getTimestamp() / 1000;
+			return Math.ceil(this.getTimestamp() / 1000);
 		}
 
 		/**
@@ -1047,6 +1048,11 @@ var DateTime = function () {
 			return hour >= 12 && minute >= 0 && second >= 0 && milliSecond > 0;
 		}
 	}], [{
+		key: 'now',
+		value: function now() {
+			return new DateTime(new Date());
+		}
+	}, {
 		key: 'isLeapYear',
 		value: function isLeapYear(year) {
 			return year % 4 === 0 && year % 100 !== 0 || year % 400 === 0;

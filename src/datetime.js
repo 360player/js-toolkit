@@ -110,7 +110,7 @@ export default class DateTime {
 	 *  @return void
 	 */
 	constructor( date : Date, skipBoundsAggregation : boolean = false, autoResolveDefaultOptions : boolean = true ) {
-		this.fromDate( date, skipBoundsAggregation );
+		this.fromDate( date || new Date(), skipBoundsAggregation );
 
 		if ( autoResolveDefaultOptions ) {
 			this.resolveDateTimeOptions();
@@ -118,9 +118,13 @@ export default class DateTime {
 	}
 
 	/**
-	 *  @var string locale
+	 *	Returns a new instance of DateTime set to current date.
+	 *
+	 *	@return DateTime
 	 */
-	locale : string = 'en-US';
+	static now() : DateTime {
+		return new DateTime( new Date() );
+	}
 
 	/**
 	 *	Sets timezone and locale based on current device resolved options.
@@ -710,7 +714,7 @@ export default class DateTime {
 	 *	@return number
 	 */
 	getUnixTimestamp() : number {
-		return this.getTimestamp() / 1000;
+		return Math.ceil( this.getTimestamp() / 1000 );
 	}
 
 	/**
