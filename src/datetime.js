@@ -152,7 +152,8 @@ export default class DateTime {
 			throw new Error( 'Must be instance of Date' );
 		}
 
-		this.dateTime = dateTime;
+		// @NOTE Make sure created date is a new date instance
+		this.dateTime = new Date( +dateTime );
 
 		if ( ! skipBoundsAggregation ) {
 			this.aggregateDateBoundsTimestamps();
