@@ -1,5 +1,7 @@
 /* @flow */
 
+if ( ! window ) window = {};
+
 /**
  *  @const string DEFAULT_TIMEZONE
  */
@@ -8,7 +10,7 @@ export const DEFAULT_TIMEZONE : string = 'Europe/Stockholm';
 /**
  *	@var string SELECTED_TIMEZONE
  */
-let SELECTED_TIMEZONE = DEFAULT_TIMEZONE;
+window.dateTimeSelectedTimeZone = DEFAULT_TIMEZONE;
 
 /**
  *  @const string DEFAULT_LOCALE
@@ -18,7 +20,7 @@ export const DEFAULT_LOCALE : string = 'en-US';
 /**
  *	@var string SELECTED_LOCALE
  */
-let SELECTED_LOCALE = DEFAULT_LOCALE;
+window.dateTimeSelectedLocale = DEFAULT_LOCALE;
 
 /**
  *	@type TimeType
@@ -196,7 +198,7 @@ export default class DateTime {
 	 *  @return void
 	 */
 	static setTimeZone( timeZone : string ) {
-		SELECTED_TIMEZONE = timeZone;
+		window.dateTimeSelectedTimeZone = timeZone;
 	}
 
 	/**
@@ -205,7 +207,7 @@ export default class DateTime {
 	 *  @return string
 	 */
 	static getTimeZone() : string {
-		return SELECTED_TIMEZONE;
+		return window.dateTimeSelectedTimeZone;
 	}
 
 	/**
@@ -216,7 +218,7 @@ export default class DateTime {
 	 *  @return void
 	 */
 	static setLocale( locale : string ) {
-		SELECTED_LOCALE = locale.replace( '_', '-' );
+		window.dateTimeSelectedLocale = locale.replace( '_', '-' );
 	}
 
 	/**
@@ -225,7 +227,7 @@ export default class DateTime {
 	 *  @return string
 	 */
 	static getLocale() : string {
-		return SELECTED_LOCALE;
+		return window.dateTimeSelectedLocale;
 	}
 
 	/**

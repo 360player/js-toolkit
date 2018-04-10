@@ -19,12 +19,17 @@ var _createClass3 = _interopRequireDefault(_createClass2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+if (!window) window = {};
+
+/**
+ *  @const string DEFAULT_TIMEZONE
+ */
 var DEFAULT_TIMEZONE = exports.DEFAULT_TIMEZONE = 'Europe/Stockholm';
 
 /**
  *	@var string SELECTED_TIMEZONE
  */
-var SELECTED_TIMEZONE = DEFAULT_TIMEZONE;
+window.dateTimeSelectedTimeZone = DEFAULT_TIMEZONE;
 
 /**
  *  @const string DEFAULT_LOCALE
@@ -34,7 +39,7 @@ var DEFAULT_LOCALE = exports.DEFAULT_LOCALE = 'en-US';
 /**
  *	@var string SELECTED_LOCALE
  */
-var SELECTED_LOCALE = DEFAULT_LOCALE;
+window.dateTimeSelectedLocale = DEFAULT_LOCALE;
 
 /**
  *	@type TimeType
@@ -1027,7 +1032,7 @@ var DateTime = function () {
 	}, {
 		key: 'setTimeZone',
 		value: function setTimeZone(timeZone) {
-			SELECTED_TIMEZONE = timeZone;
+			window.dateTimeSelectedTimeZone = timeZone;
 		}
 
 		/**
@@ -1039,7 +1044,7 @@ var DateTime = function () {
 	}, {
 		key: 'getTimeZone',
 		value: function getTimeZone() {
-			return SELECTED_TIMEZONE;
+			return window.dateTimeSelectedTimeZone;
 		}
 
 		/**
@@ -1053,7 +1058,7 @@ var DateTime = function () {
 	}, {
 		key: 'setLocale',
 		value: function setLocale(locale) {
-			SELECTED_LOCALE = locale.replace('_', '-');
+			window.dateTimeSelectedLocale = locale.replace('_', '-');
 		}
 
 		/**
@@ -1065,7 +1070,7 @@ var DateTime = function () {
 	}, {
 		key: 'getLocale',
 		value: function getLocale() {
-			return SELECTED_LOCALE;
+			return window.dateTimeSelectedLocale;
 		}
 
 		/**
