@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
-exports.Calendar = undefined;
+exports.Calendar = exports.DEFAULT_LOCALE = exports.DEFAULT_TIMEZONE = undefined;
 
 var _slicedToArray2 = require('babel-runtime/helpers/slicedToArray');
 
@@ -19,12 +19,22 @@ var _createClass3 = _interopRequireDefault(_createClass2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var DEFAULT_TIMEZONE = 'Europe/Stockholm';
+var DEFAULT_TIMEZONE = exports.DEFAULT_TIMEZONE = 'Europe/Stockholm';
+
+/**
+ *	@var string SELECTED_TIMEZONE
+ */
+var SELECTED_TIMEZONE = DEFAULT_TIMEZONE;
 
 /**
  *  @const string DEFAULT_LOCALE
  */
-var DEFAULT_LOCALE = 'en-US';
+var DEFAULT_LOCALE = exports.DEFAULT_LOCALE = 'en-US';
+
+/**
+ *	@var string SELECTED_LOCALE
+ */
+var SELECTED_LOCALE = DEFAULT_LOCALE;
 
 /**
  *	@type TimeType
@@ -77,11 +87,6 @@ var DateTime = function () {
 
 
 	/**
-  *  @var string locale
-  */
-
-
-	/**
   *  @var TimeType endOfMonth
   */
 
@@ -98,8 +103,6 @@ var DateTime = function () {
 		var skipBoundsAggregation = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 		var autoResolveDefaultOptions = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
 		(0, _classCallCheck3.default)(this, DateTime);
-		this.timeZone = DEFAULT_TIMEZONE;
-		this.locale = DEFAULT_LOCALE;
 		this.enforce24hFormat = false;
 
 		this.fromDate(date || new Date(), skipBoundsAggregation);
@@ -118,11 +121,6 @@ var DateTime = function () {
 
 	/**
   *	@var bool enforce24hFormat
-  */
-
-
-	/**
-  *  @var string timeZone
   */
 
 
@@ -151,8 +149,8 @@ var DateTime = function () {
 			    timeZone = _Intl$DateTimeFormat$.timeZone,
 			    locale = _Intl$DateTimeFormat$.locale;
 
-			this.setTimeZone(timeZone);
-			this.setLocale(locale);
+			DateTime.setTimeZone(timeZone);
+			DateTime.setLocale(locale);
 		}
 
 		/**
@@ -221,54 +219,6 @@ var DateTime = function () {
    *  @param string timeZone
    *
    *  @return void
-   */
-
-	}, {
-		key: 'setTimeZone',
-		value: function setTimeZone(timeZone) {
-			this.timeZone = timeZone;
-		}
-
-		/**
-   *  Returns current time zone.
-   *
-   *  @return string
-   */
-
-	}, {
-		key: 'getTimeZone',
-		value: function getTimeZone() {
-			return this.timeZone;
-		}
-
-		/**
-   *  Sets current locale.
-   *
-   *  @param string locale
-   *
-   *  @return void
-   */
-
-	}, {
-		key: 'setLocale',
-		value: function setLocale(locale) {
-			this.locale = locale;
-		}
-
-		/**
-   *  Returns current locale.
-   *
-   *  @return string
-   */
-
-	}, {
-		key: 'getLocale',
-		value: function getLocale() {
-			return this.locale;
-		}
-
-		/**
-   *  @prop bool isLeapYear
    */
 
 	}, {
@@ -344,7 +294,7 @@ var DateTime = function () {
 
 			try {
 				// @FLOWFIXME https://github.com/facebook/flow/issues/2801
-				var formatter = new Intl.DateTimeFormat(this.locale, { hour: 'numeric', hour12: true });
+				var formatter = new Intl.DateTimeFormat(DateTime.getLocale(), { hour: 'numeric', hour12: true });
 				var dayPeriodFilter = function dayPeriodFilter(n) {
 					return n.type.toLowerCase() === 'dayperiod';
 				};
@@ -356,13 +306,14 @@ var DateTime = function () {
 				pm = formatter.formatToParts(pmDate).find(dayPeriodFilter).value;
 
 				var reMeridiem = new RegExp(am + '|' + pm, 'g');
-				prefer12h = reMeridiem.test(amDate.toLocaleTimeString(this.locale));
+				prefer12h = reMeridiem.test(amDate.toLocaleTimeString(DateTime.getLocale()));
 			} catch (error) {
 				throw new Error(error);
 			}
 
 			var meridiemLocaleObject = { am: am, pm: pm, prefer12h: prefer12h };
 
+			this.enforce24hFormat = prefer12h;
 			this.meridiemLocaleObject = meridiemLocaleObject;
 		}
 
@@ -376,32 +327,8 @@ var DateTime = function () {
    */
 
 	}, {
-		key: 'durationOf',
-		value: function durationOf(value, granularity) {
-			var granularities = {
-				millisecond: 1,
-				second: 1000,
-				minute: 60000,
-				hour: 3600000,
-				day: 86400000,
-				week: 604800000
-			};
+		key: 'toNearestGranularity',
 
-			// @NOTE Pluralize granularities
-			Object.entries(granularities).forEach(function (_ref) {
-				var _ref2 = (0, _slicedToArray3.default)(_ref, 2),
-				    key = _ref2[0],
-				    value = _ref2[1];
-
-				return granularities[key + 's'] = value;
-			});
-
-			if (granularities.hasOwnProperty(granularity)) {
-				return granularities[granularity] * Math.abs(value);
-			}
-
-			return null;
-		}
 
 		/**
    *	Rounds date to nearest granularity.
@@ -412,13 +339,10 @@ var DateTime = function () {
    *
    *	@return self
    */
-
-	}, {
-		key: 'toNearestGranularity',
 		value: function toNearestGranularity(value, granularity) {
 			var roundDirection = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'up';
 
-			var duration = this.durationOf(value, granularity);
+			var duration = DateTime.durationOf(value, granularity);
 
 			if (!duration) {
 				throw new Error('Not a valid time granularity.');
@@ -895,7 +819,7 @@ var DateTime = function () {
 				this.dateTime.setMonth(prevMonths);
 			} else {
 				var _timestamp = this.dateTime.getTime();
-				var duration = this.durationOf(decrementValue, granularity);
+				var duration = DateTime.durationOf(decrementValue, granularity);
 
 				this.dateTime = new Date(Math.abs(_timestamp - parseInt(duration)));
 			}
@@ -929,7 +853,7 @@ var DateTime = function () {
 				this.dateTime.setMonth(nextMonths);
 			} else {
 				var _timestamp2 = this.dateTime.getTime();
-				var duration = this.durationOf(incrementValue, granularity);
+				var duration = DateTime.durationOf(incrementValue, granularity);
 
 				this.dateTime = new Date(_timestamp2 + parseInt(duration));
 			}
@@ -950,7 +874,7 @@ var DateTime = function () {
 	}, {
 		key: 'toLocaleDateString',
 		value: function toLocaleDateString(formatOptions) {
-			return this.dateTime.toLocaleDateString(this.locale, formatOptions);
+			return this.dateTime.toLocaleDateString(DateTime.getLocale(), formatOptions);
 		}
 
 		/**
@@ -964,40 +888,87 @@ var DateTime = function () {
 	}, {
 		key: 'toLocaleTimeString',
 		value: function toLocaleTimeString(formatOptions) {
-			return this.dateTime.toLocaleTimeString(this.locale, formatOptions);
+			return this.dateTime.toLocaleTimeString(DateTime.getLocale(), formatOptions);
 		}
+
+		/**
+   *	Returns localized calendar date.
+   *
+   *	@return string
+   */
+
 	}, {
 		key: 'toCalendarDateString',
 		value: function toCalendarDateString() {
 			return this.toLocaleDateString({ year: 'numeric', month: 'long' });
 		}
+
+		/**
+   *	Returns localized date (short).
+   *
+   *	@return string
+   */
+
 	}, {
 		key: 'toDateString',
 		value: function toDateString() {
 			return this.toLocaleDateString({ year: 'numeric', month: 'numeric', day: 'numeric' });
 		}
+
+		/**
+   *	Returns localized long date.
+   *
+   *	@return string
+   */
+
 	}, {
 		key: 'toLongDateString',
 		value: function toLongDateString() {
 			return this.toLocaleDateString({ weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 		}
+
+		/**
+   *	Returns localized time (short).
+   *
+   *	@return string
+   */
+
 	}, {
 		key: 'toTimeString',
 		value: function toTimeString() {
 			return this.toLocaleTimeString({ hour: '2-digit', minute: '2-digit', hour12: !this.enforce24hFormat });
 		}
+
+		/**
+   *	Returns localized time (short).
+   *
+   *	@return string
+   */
+
 	}, {
 		key: 'toLongTimeString',
 		value: function toLongTimeString() {
-			var enforce24hFormat = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-
 			return this.toLocaleTimeString({ hour12: !this.enforce24hFormat });
 		}
+
+		/**
+   *	Returns localized weekday name (short).
+   *
+   *	@return string
+   */
+
 	}, {
 		key: 'toWeekdayString',
 		value: function toWeekdayString() {
 			return this.toLocaleDateString({ weekday: 'short' });
 		}
+
+		/**
+   *	Returns localized long weekday name.
+   *
+   *	@return string
+   */
+
 	}, {
 		key: 'toLongWeekdayString',
 		value: function toLongWeekdayString() {
@@ -1054,6 +1025,54 @@ var DateTime = function () {
 			return new DateTime(new Date());
 		}
 	}, {
+		key: 'setTimeZone',
+		value: function setTimeZone(timeZone) {
+			SELECTED_TIMEZONE = timeZone;
+		}
+
+		/**
+   *  Returns current time zone.
+   *
+   *  @return string
+   */
+
+	}, {
+		key: 'getTimeZone',
+		value: function getTimeZone() {
+			return SELECTED_TIMEZONE;
+		}
+
+		/**
+   *  Sets current locale.
+   *
+   *  @param string locale
+   *
+   *  @return void
+   */
+
+	}, {
+		key: 'setLocale',
+		value: function setLocale(locale) {
+			SELECTED_LOCALE = locale.replace('_', '-');
+		}
+
+		/**
+   *  Returns current locale.
+   *
+   *  @return string
+   */
+
+	}, {
+		key: 'getLocale',
+		value: function getLocale() {
+			return SELECTED_LOCALE;
+		}
+
+		/**
+   *  @prop bool isLeapYear
+   */
+
+	}, {
 		key: 'isLeapYear',
 		value: function isLeapYear(year) {
 			return year % 4 === 0 && year % 100 !== 0 || year % 400 === 0;
@@ -1088,6 +1107,33 @@ var DateTime = function () {
 			if (monthOffset < 0) monthOffset = 0;
 
 			return daysInMonths[monthOffset];
+		}
+	}, {
+		key: 'durationOf',
+		value: function durationOf(value, granularity) {
+			var granularities = {
+				millisecond: 1,
+				second: 1000,
+				minute: 60000,
+				hour: 3600000,
+				day: 86400000,
+				week: 604800000
+			};
+
+			// @NOTE Pluralize granularities
+			Object.entries(granularities).forEach(function (_ref) {
+				var _ref2 = (0, _slicedToArray3.default)(_ref, 2),
+				    key = _ref2[0],
+				    value = _ref2[1];
+
+				return granularities[key + 's'] = value;
+			});
+
+			if (granularities.hasOwnProperty(granularity)) {
+				return granularities[granularity] * Math.abs(value);
+			}
+
+			return null;
 		}
 	}, {
 		key: 'isToday',

@@ -3,12 +3,22 @@
 /**
  *  @const string DEFAULT_TIMEZONE
  */
-const DEFAULT_TIMEZONE : string = 'Europe/Stockholm';
+export const DEFAULT_TIMEZONE : string = 'Europe/Stockholm';
+
+/**
+ *	@var string SELECTED_TIMEZONE
+ */
+let SELECTED_TIMEZONE = DEFAULT_TIMEZONE;
 
 /**
  *  @const string DEFAULT_LOCALE
  */
-const DEFAULT_LOCALE : string = 'en-US';
+export const DEFAULT_LOCALE : string = 'en-US';
+
+/**
+ *	@var string SELECTED_LOCALE
+ */
+let SELECTED_LOCALE = DEFAULT_LOCALE;
 
 /**
  *	@type TimeType
@@ -81,16 +91,6 @@ export default class DateTime {
 	endOfMonth : TimeType;
 
 	/**
-	 *  @var string timeZone
-	 */
-	timeZone : string = DEFAULT_TIMEZONE;
-
-	/**
-	 *  @var string locale
-	 */
-	locale : string = DEFAULT_LOCALE;
-
-	/**
 	 *	@var bool enforce24hFormat
 	 */
 	enforce24hFormat : boolean = false;
@@ -135,8 +135,8 @@ export default class DateTime {
 		// @FLOWFIXME https://github.com/facebook/flow/issues/2801
 		const { timeZone, locale } = Intl.DateTimeFormat().resolvedOptions();
 
-		this.setTimeZone( timeZone );
-		this.setLocale( locale );
+		DateTime.setTimeZone( timeZone );
+		DateTime.setLocale( locale );
 	}
 
 	/**
@@ -195,8 +195,8 @@ export default class DateTime {
 	 *
 	 *  @return void
 	 */
-	setTimeZone( timeZone : string ) {
-		this.timeZone = timeZone;
+	static setTimeZone( timeZone : string ) {
+		SELECTED_TIMEZONE = timeZone;
 	}
 
 	/**
@@ -204,8 +204,8 @@ export default class DateTime {
 	 *
 	 *  @return string
 	 */
-	getTimeZone() : string {
-		return this.timeZone;
+	static getTimeZone() : string {
+		return SELECTED_TIMEZONE;
 	}
 
 	/**
@@ -215,8 +215,8 @@ export default class DateTime {
 	 *
 	 *  @return void
 	 */
-	setLocale( locale : string ) {
-		this.locale = locale;
+	static setLocale( locale : string ) {
+		SELECTED_LOCALE = locale.replace( '_', '-' );
 	}
 
 	/**
@@ -224,8 +224,8 @@ export default class DateTime {
 	 *
 	 *  @return string
 	 */
-	getLocale() : string {
-		return this.locale;
+	static getLocale() : string {
+		return SELECTED_LOCALE;
 	}
 
 	/**
@@ -327,7 +327,7 @@ export default class DateTime {
 
 		try {
 			// @FLOWFIXME https://github.com/facebook/flow/issues/2801
-			const formatter = new Intl.DateTimeFormat( this.locale, { hour : 'numeric', hour12 : true });
+			const formatter = new Intl.DateTimeFormat( DateTime.getLocale(), { hour : 'numeric', hour12 : true });
 			const dayPeriodFilter = n => ( n.type.toLowerCase() === 'dayperiod' );
 
 			let amDate : Date = new Date( 1970, 0, 1, 0, 0, 0, 0 );
@@ -337,13 +337,14 @@ export default class DateTime {
 			pm = formatter.formatToParts( pmDate ).find( dayPeriodFilter ).value;
 
 			let reMeridiem : RegExp = new RegExp(`${am}|${pm}`, 'g' );
-			prefer12h = reMeridiem.test( amDate.toLocaleTimeString( this.locale ) );
+			prefer12h = reMeridiem.test( amDate.toLocaleTimeString( DateTime.getLocale() ) );
 		} catch ( error ) {
 			throw new Error( error );
 		}
 
 		const meridiemLocaleObject : MeridiemLocaleType = { am, pm, prefer12h };
 
+		this.enforce24hFormat = prefer12h;
 		this.meridiemLocaleObject = meridiemLocaleObject;
 	}
 
@@ -355,7 +356,7 @@ export default class DateTime {
 	 *
 	 *  @return number
 	 */
-	durationOf( value : number , granularity : string ) : ?number {
+	static durationOf( value : number , granularity : string ) : ?number {
 		let granularities = {
 			millisecond : 1,
 			second : 1000,
@@ -385,7 +386,7 @@ export default class DateTime {
 	 *	@return self
 	 */
 	toNearestGranularity( value : number, granularity : string, roundDirection : RoundDirectionType = 'up' ) : DateTime {
-		const duration = this.durationOf( value, granularity );
+		const duration = DateTime.durationOf( value, granularity );
 
 		if ( ! duration ) {
 			throw new Error( 'Not a valid time granularity.' );
@@ -795,7 +796,7 @@ export default class DateTime {
 			this.dateTime.setMonth( prevMonths );
 		} else {
 			let timestamp : number = this.dateTime.getTime();
-			let duration : ?number = this.durationOf( decrementValue, granularity );
+			let duration : ?number = DateTime.durationOf( decrementValue, granularity );
 
 			this.dateTime = new Date( Math.abs( timestamp - parseInt( duration ) ) );
 		}
@@ -824,7 +825,7 @@ export default class DateTime {
 			this.dateTime.setMonth( nextMonths );
 		} else {
 			let timestamp : number = this.dateTime.getTime();
-			let duration : ?number = this.durationOf( incrementValue, granularity );
+			let duration : ?number = DateTime.durationOf( incrementValue, granularity );
 
 			this.dateTime = new Date( timestamp + parseInt( duration ) );
 		}
@@ -842,7 +843,7 @@ export default class DateTime {
 	 *	@return string
 	 */
 	toLocaleDateString( formatOptions : Date$LocaleOptions ) : string {
-		return this.dateTime.toLocaleDateString( this.locale, formatOptions );
+		return this.dateTime.toLocaleDateString( DateTime.getLocale(), formatOptions );
 	}
 
 	/**
@@ -853,33 +854,68 @@ export default class DateTime {
 	 *	@return string
 	 */
 	toLocaleTimeString( formatOptions : Date$LocaleOptions ) : string {
-		return this.dateTime.toLocaleTimeString( this.locale, formatOptions );
+		return this.dateTime.toLocaleTimeString( DateTime.getLocale(), formatOptions );
 	}
 
+	/**
+	 *	Returns localized calendar date.
+	 *
+	 *	@return string
+	 */
 	toCalendarDateString() : string {
 		return this.toLocaleDateString({ year : 'numeric', month : 'long' });
 	}
 
+	/**
+	 *	Returns localized date (short).
+	 *
+	 *	@return string
+	 */
 	toDateString() : string {
 		return this.toLocaleDateString({ year: 'numeric', month: 'numeric', day: 'numeric' });
 	}
 
+	/**
+	 *	Returns localized long date.
+	 *
+	 *	@return string
+	 */
 	toLongDateString() : string {
 		return this.toLocaleDateString({ weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 	}
 
+	/**
+	 *	Returns localized time (short).
+	 *
+	 *	@return string
+	 */
 	toTimeString() : string {
 		return this.toLocaleTimeString({ hour : '2-digit', minute : '2-digit', hour12 : ! this.enforce24hFormat });
 	}
 
-	toLongTimeString( enforce24hFormat : boolean = false ) : string {
+	/**
+	 *	Returns localized time (short).
+	 *
+	 *	@return string
+	 */
+	toLongTimeString( ) : string {
 		return this.toLocaleTimeString({ hour12 : ! this.enforce24hFormat });
 	}
 
+	/**
+	 *	Returns localized weekday name (short).
+	 *
+	 *	@return string
+	 */
 	toWeekdayString() : string {
 		return this.toLocaleDateString({ weekday : 'short' });
 	}
 
+	/**
+	 *	Returns localized long weekday name.
+	 *
+	 *	@return string
+	 */
 	toLongWeekdayString() : string {
 		return this.toLocaleDateString({ weekday : 'long' });
 	}
