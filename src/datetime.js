@@ -8,19 +8,9 @@ if ( ! window ) window = {};
 export const DEFAULT_TIMEZONE : string = 'Europe/Stockholm';
 
 /**
- *	@var string SELECTED_TIMEZONE
- */
-window.dateTimeSelectedTimeZone = DEFAULT_TIMEZONE;
-
-/**
  *  @const string DEFAULT_LOCALE
  */
 export const DEFAULT_LOCALE : string = 'en-US';
-
-/**
- *	@var string SELECTED_LOCALE
- */
-window.dateTimeSelectedLocale = DEFAULT_LOCALE;
 
 /**
  *	@type TimeType
@@ -207,7 +197,7 @@ export default class DateTime {
 	 *  @return string
 	 */
 	static getTimeZone() : string {
-		return window.dateTimeSelectedTimeZone;
+		return window.dateTimeSelectedTimeZone || DEFAULT_TIMEZONE;
 	}
 
 	/**
@@ -227,7 +217,7 @@ export default class DateTime {
 	 *  @return string
 	 */
 	static getLocale() : string {
-		return window.dateTimeSelectedLocale;
+		return window.dateTimeSelectedLocale || DEFAULT_LOCALE;
 	}
 
 	/**

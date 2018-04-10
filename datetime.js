@@ -27,19 +27,9 @@ if (!window) window = {};
 var DEFAULT_TIMEZONE = exports.DEFAULT_TIMEZONE = 'Europe/Stockholm';
 
 /**
- *	@var string SELECTED_TIMEZONE
- */
-window.dateTimeSelectedTimeZone = DEFAULT_TIMEZONE;
-
-/**
  *  @const string DEFAULT_LOCALE
  */
 var DEFAULT_LOCALE = exports.DEFAULT_LOCALE = 'en-US';
-
-/**
- *	@var string SELECTED_LOCALE
- */
-window.dateTimeSelectedLocale = DEFAULT_LOCALE;
 
 /**
  *	@type TimeType
@@ -1044,7 +1034,7 @@ var DateTime = function () {
 	}, {
 		key: 'getTimeZone',
 		value: function getTimeZone() {
-			return window.dateTimeSelectedTimeZone;
+			return window.dateTimeSelectedTimeZone || DEFAULT_TIMEZONE;
 		}
 
 		/**
@@ -1070,7 +1060,7 @@ var DateTime = function () {
 	}, {
 		key: 'getLocale',
 		value: function getLocale() {
-			return window.dateTimeSelectedLocale;
+			return window.dateTimeSelectedLocale || DEFAULT_LOCALE;
 		}
 
 		/**
