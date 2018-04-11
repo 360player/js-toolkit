@@ -96,11 +96,6 @@ export default class DateTime {
 	endOfMonth : TimeType;
 
 	/**
-	 *	@var bool enforce24hFormat
-	 */
-	enforce24hFormat : boolean = false;
-
-	/**
 	 *	@var MeridiemLocaleType meridiemLocaleObject
 	 */
 	meridiemLocaleObject : MeridiemLocaleType;
@@ -902,7 +897,7 @@ export default class DateTime {
 	 *	@return string
 	 */
 	toTimeString() : string {
-		return this.toLocaleTimeString({ hour : '2-digit', minute : '2-digit', hour12 : ! this.enforce24hFormat });
+		return this.toLocaleTimeString({ hour : '2-digit', minute : '2-digit' });
 	}
 
 	/**
@@ -911,7 +906,7 @@ export default class DateTime {
 	 *	@return string
 	 */
 	toLongTimeString( ) : string {
-		return this.toLocaleTimeString({ hour12 : ! this.enforce24hFormat });
+		return this.toLocaleTimeString({});
 	}
 
 	/**
