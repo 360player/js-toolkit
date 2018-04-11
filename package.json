@@ -1,7 +1,7 @@
 {
 	"private": true,
 	"name": "js-toolkit",
-	"version": "0.2.22",
+	"version": "0.2.23",
 	"description": "Common utility functions for modern JavaScript development.",
 	"main": "./src/index.js",
 	"author": "Robin Grass <robin@360player.com>",

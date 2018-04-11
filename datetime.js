@@ -89,7 +89,6 @@ var DateTime = function () {
   *
   *  @param Date date
   *	@param bool skipBoundsAggregation
-  *	@param bool autoResolveDefaultOptions
   *
   *  @return void
   */
@@ -945,7 +944,7 @@ var DateTime = function () {
 	}, {
 		key: 'toTimeString',
 		value: function toTimeString() {
-			return this.toLocaleTimeString({ hour: '2-digit', minute: '2-digit', hour12: !this.enforce24hFormat });
+			return this.toLocaleTimeString({ hour: '2-digit', minute: '2-digit' });
 		}
 
 		/**
@@ -957,7 +956,7 @@ var DateTime = function () {
 	}, {
 		key: 'toLongTimeString',
 		value: function toLongTimeString() {
-			return this.toLocaleTimeString({ hour12: !this.enforce24hFormat });
+			return this.toLocaleTimeString({});
 		}
 
 		/**
