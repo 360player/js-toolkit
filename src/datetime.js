@@ -1,16 +1,17 @@
 /* @flow */
 
-if ( ! window ) window = {};
+/* @imports */
+import WeakStorage from './storage/weakstorage';
 
 /**
- *  @const string DEFAULT_TIMEZONE
+ *  @const string FALLBACK_TIMEZONE
  */
-export const DEFAULT_TIMEZONE : string = 'Europe/Stockholm';
+const FALLBACK_TIMEZONE : string = 'Europe/Stockholm';
 
 /**
- *  @const string DEFAULT_LOCALE
+ *  @const string FALLBACK_LOCALE
  */
-export const DEFAULT_LOCALE : string = 'en-US';
+const FALLBACK_LOCALE : string = 'en-US';
 
 /**
  *	@type TimeType
@@ -51,6 +52,18 @@ type RoundDirectionType = 'up' | 'down';
  *	@type LocaleOptionsType
  */
 type LocaleOptionsType = { [ key : string ] : string | boolean };
+
+/* @NOTE Store locale and timezone in sessionStorage if present, otherwise fall back to WeakStorage */
+
+/**
+ *	@const WeakStorage weakStorage
+ */
+const weakStorage : WeakStorage = new WeakStorage();
+
+/**
+ *	@const SessionStorage|WeakStorage selectedLocaleStore
+ */
+const selectedLocaleStore = ( window && window.sessionStorage ) ? window.sessionStorage : weakStorage;
 
 /**
  *	Date manipulation and presentation helper class.
@@ -188,7 +201,7 @@ export default class DateTime {
 	 *  @return void
 	 */
 	static setTimeZone( timeZone : string ) {
-		window.dateTimeSelectedTimeZone = timeZone;
+		selectedLocaleStore.setItem( '__dateTime:timeZone', timeZone );
 	}
 
 	/**
@@ -197,7 +210,13 @@ export default class DateTime {
 	 *  @return string
 	 */
 	static getTimeZone() : string {
-		return window.dateTimeSelectedTimeZone || DEFAULT_TIMEZONE;
+		let timeZone = selectedLocaleStore.getItem( '__dateTime:timeZone' );
+
+		if ( ! timeZone ) {
+			return FALLBACK_TIMEZONE;
+		}
+
+		return String( timeZone );
 	}
 
 	/**
@@ -208,7 +227,7 @@ export default class DateTime {
 	 *  @return void
 	 */
 	static setLocale( locale : string ) {
-		window.dateTimeSelectedLocale = locale.replace( '_', '-' );
+		selectedLocaleStore.setItem( '__dateTime:locale', locale.replace( '_', '-' ) );
 	}
 
 	/**
@@ -217,7 +236,13 @@ export default class DateTime {
 	 *  @return string
 	 */
 	static getLocale() : string {
-		return window.dateTimeSelectedLocale || DEFAULT_LOCALE;
+		let locale = selectedLocaleStore.getItem( '__dateTime:locale' );
+
+		if ( ! locale ) {
+			return FALLBACK_LOCALE;
+		}
+
+		return String( locale );
 	}
 
 	/**

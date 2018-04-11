@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
-exports.Calendar = exports.DEFAULT_LOCALE = exports.DEFAULT_TIMEZONE = undefined;
+exports.Calendar = undefined;
 
 var _slicedToArray2 = require('babel-runtime/helpers/slicedToArray');
 
@@ -17,19 +17,24 @@ var _createClass2 = require('babel-runtime/helpers/createClass');
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
+var _weakstorage = require('./storage/weakstorage');
+
+var _weakstorage2 = _interopRequireDefault(_weakstorage);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-if (!window) window = {};
+/**
+ *  @const string FALLBACK_TIMEZONE
+ */
+var FALLBACK_TIMEZONE = 'Europe/Stockholm';
 
 /**
- *  @const string DEFAULT_TIMEZONE
+ *  @const string FALLBACK_LOCALE
  */
-var DEFAULT_TIMEZONE = exports.DEFAULT_TIMEZONE = 'Europe/Stockholm';
 
-/**
- *  @const string DEFAULT_LOCALE
- */
-var DEFAULT_LOCALE = exports.DEFAULT_LOCALE = 'en-US';
+
+/* @imports */
+var FALLBACK_LOCALE = 'en-US';
 
 /**
  *	@type TimeType
@@ -60,9 +65,23 @@ var DEFAULT_LOCALE = exports.DEFAULT_LOCALE = 'en-US';
  *	@type LocaleOptionsType
  */
 
+
+/* @NOTE Store locale and timezone in sessionStorage if present, otherwise fall back to WeakStorage */
+
+/**
+ *	@const WeakStorage weakStorage
+ */
+var weakStorage = new _weakstorage2.default();
+
+/**
+ *	@const SessionStorage|WeakStorage selectedLocaleStore
+ */
+var selectedLocaleStore = window && window.sessionStorage ? window.sessionStorage : weakStorage;
+
 /**
  *	Date manipulation and presentation helper class.
  */
+
 var DateTime = function () {
 
 	/**
@@ -1022,7 +1041,7 @@ var DateTime = function () {
 	}, {
 		key: 'setTimeZone',
 		value: function setTimeZone(timeZone) {
-			window.dateTimeSelectedTimeZone = timeZone;
+			selectedLocaleStore.setItem('__dateTime:timeZone', timeZone);
 		}
 
 		/**
@@ -1034,7 +1053,13 @@ var DateTime = function () {
 	}, {
 		key: 'getTimeZone',
 		value: function getTimeZone() {
-			return window.dateTimeSelectedTimeZone || DEFAULT_TIMEZONE;
+			var timeZone = selectedLocaleStore.getItem('__dateTime:timeZone');
+
+			if (!timeZone) {
+				return FALLBACK_TIMEZONE;
+			}
+
+			return String(timeZone);
 		}
 
 		/**
@@ -1048,7 +1073,7 @@ var DateTime = function () {
 	}, {
 		key: 'setLocale',
 		value: function setLocale(locale) {
-			window.dateTimeSelectedLocale = locale.replace('_', '-');
+			selectedLocaleStore.setItem('__dateTime:locale', locale.replace('_', '-'));
 		}
 
 		/**
@@ -1060,7 +1085,13 @@ var DateTime = function () {
 	}, {
 		key: 'getLocale',
 		value: function getLocale() {
-			return window.dateTimeSelectedLocale || DEFAULT_LOCALE;
+			var locale = selectedLocaleStore.getItem('__dateTime:locale');
+
+			if (!locale) {
+				return FALLBACK_LOCALE;
+			}
+
+			return String(locale);
 		}
 
 		/**
