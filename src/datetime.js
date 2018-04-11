@@ -110,16 +110,11 @@ export default class DateTime {
 	 *
 	 *  @param Date date
 	 *	@param bool skipBoundsAggregation
-	 *	@param bool autoResolveDefaultOptions
 	 *
 	 *  @return void
 	 */
-	constructor( date : Date, skipBoundsAggregation : boolean = false, autoResolveDefaultOptions : boolean = true ) {
+	constructor( date : Date, skipBoundsAggregation : boolean = false ) {
 		this.fromDate( date || new Date(), skipBoundsAggregation );
-
-		if ( autoResolveDefaultOptions ) {
-			this.resolveDateTimeOptions();
-		}
 	}
 
 	/**

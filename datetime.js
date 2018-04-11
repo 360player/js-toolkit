@@ -115,15 +115,10 @@ var DateTime = function () {
   */
 	function DateTime(date) {
 		var skipBoundsAggregation = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-		var autoResolveDefaultOptions = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
 		(0, _classCallCheck3.default)(this, DateTime);
 		this.enforce24hFormat = false;
 
 		this.fromDate(date || new Date(), skipBoundsAggregation);
-
-		if (autoResolveDefaultOptions) {
-			this.resolveDateTimeOptions();
-		}
 	}
 
 	/**
