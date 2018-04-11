@@ -1,12 +1,16 @@
 /* @dependencies */
-import DateTime, { DEFAULT_TIMEZONE, DEFAULT_LOCALE } from '../src/datetime';
+import DateTime from '../src/datetime';
+
+const FALLBACK_TIMEZONE = 'Europe/Stockholm';
+
+const FALLBACK_LOCALE = 'en-US';
 
 describe('DateTime', () => {
 
 	beforeEach(() => {
 		// Make sure we use the same locale in each test.
-		DateTime.setTimeZone( DEFAULT_TIMEZONE );
-		DateTime.setLocale( DEFAULT_LOCALE );
+		DateTime.setTimeZone( FALLBACK_TIMEZONE );
+		DateTime.setLocale( FALLBACK_LOCALE );
 	});
 
 	it('can override timezone globally', () => {
