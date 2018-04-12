@@ -95,11 +95,6 @@ var DateTime = function () {
 
 
 	/**
-  *	@var MeridiemLocaleType meridiemLocaleObject
-  */
-
-
-	/**
   *  @var TimeType endOfMonth
   */
 
@@ -115,7 +110,6 @@ var DateTime = function () {
 	function DateTime(date) {
 		var skipBoundsAggregation = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 		(0, _classCallCheck3.default)(this, DateTime);
-		this.enforce24hFormat = false;
 
 		this.fromDate(date || new Date(), skipBoundsAggregation);
 	}
@@ -128,7 +122,7 @@ var DateTime = function () {
 
 
 	/**
-  *	@var bool enforce24hFormat
+  *	@var MeridiemLocaleType meridiemLocaleObject
   */
 
 
@@ -320,8 +314,6 @@ var DateTime = function () {
 			}
 
 			var meridiemLocaleObject = { am: am, pm: pm, prefer12h: prefer12h };
-
-			this.enforce24hFormat = prefer12h;
 			this.meridiemLocaleObject = meridiemLocaleObject;
 		}
 

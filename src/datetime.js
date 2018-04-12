@@ -350,8 +350,6 @@ export default class DateTime {
 		}
 
 		const meridiemLocaleObject : MeridiemLocaleType = { am, pm, prefer12h };
-
-		this.enforce24hFormat = prefer12h;
 		this.meridiemLocaleObject = meridiemLocaleObject;
 	}
 
