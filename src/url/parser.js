@@ -45,7 +45,6 @@ const REGEX_LOOKUP_CAPTURE : string = '([^\/]+)';
  */
 const REGEX_LOOKUP_QUERY : RegExp = /\S[^?]*(?:\?+|$)/g;
 
-
 /**
  *	URL parser and matcher
  */

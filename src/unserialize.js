@@ -30,17 +30,15 @@ export function unserializeValue( unresolvedValue : string ) : mixed {
  *	@return string
  */
 export default function unserialize( unresolvedString : string ) : MixedObjectType {
-	// @FLOWFIXME https://github.com/facebook/flow/issues/2221
-	let parameterSegments : Array<string> = `${unresolvedString}`.split( '&' );
 	const unserializedObject : MixedObjectType = {};
+	const urlSearchParams : URLSearchParams = new URLSearchParams( unresolvedString );
 
-	parameterSegments.forEach( parameterSegment => {
-		const [ key, value ] = parameterSegment.split( '=' );
+	for ( let [ key, value ] of urlSearchParams.entries() ) {
 		const decodedKey : string = decodeURIComponent( key );
-		let decodedValue : mixed = unserializeValue( decodeURIComponent( value ) );
+		const decodedValue : mixed = unserializeValue( decodeURIComponent( value ) );
 
 		unserializedObject[ decodedKey ] = decodedValue;
-	});
+	}
 
 	return unserializedObject;
 }

@@ -43,21 +43,38 @@ function unserializeValue(unresolvedValue) {
 
 /* @type-dependencies */
 function unserialize(unresolvedString) {
-	// @FLOWFIXME https://github.com/facebook/flow/issues/2221
-	var parameterSegments = ('' + unresolvedString).split('&');
 	var unserializedObject = {};
+	var urlSearchParams = new URLSearchParams(unresolvedString);
 
-	parameterSegments.forEach(function (parameterSegment) {
-		var _parameterSegment$spl = parameterSegment.split('='),
-		    _parameterSegment$spl2 = (0, _slicedToArray3.default)(_parameterSegment$spl, 2),
-		    key = _parameterSegment$spl2[0],
-		    value = _parameterSegment$spl2[1];
+	var _iteratorNormalCompletion = true;
+	var _didIteratorError = false;
+	var _iteratorError = undefined;
 
-		var decodedKey = decodeURIComponent(key);
-		var decodedValue = unserializeValue(decodeURIComponent(value));
+	try {
+		for (var _iterator = urlSearchParams.entries()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+			var _step$value = (0, _slicedToArray3.default)(_step.value, 2),
+			    key = _step$value[0],
+			    value = _step$value[1];
 
-		unserializedObject[decodedKey] = decodedValue;
-	});
+			var decodedKey = decodeURIComponent(key);
+			var decodedValue = unserializeValue(decodeURIComponent(value));
+
+			unserializedObject[decodedKey] = decodedValue;
+		}
+	} catch (err) {
+		_didIteratorError = true;
+		_iteratorError = err;
+	} finally {
+		try {
+			if (!_iteratorNormalCompletion && _iterator.return) {
+				_iterator.return();
+			}
+		} finally {
+			if (_didIteratorError) {
+				throw _iteratorError;
+			}
+		}
+	}
 
 	return unserializedObject;
 }
