@@ -328,11 +328,12 @@ export default class DateTime {
 	 *	@return void
 	 */
 	aggregateMeridiemLocaleObject() {
-		let am : string = 'AM';
-		let pm : string = 'PM';
-		let prefer12h : boolean = true;
+		let am : string = 'am';
+		let pm : string = 'pm';
+		let prefer12h : boolean = false;
 
-		try {
+		// @FLOWFIXME https://github.com/facebook/flow/issues/2801
+		if ( typeof Intl.DateTimeFormat.prototype.formatToParts === 'function' ) {
 			// @FLOWFIXME https://github.com/facebook/flow/issues/2801
 			const formatter = new Intl.DateTimeFormat( DateTime.getLocale(), { hour : 'numeric', hour12 : true });
 			const dayPeriodFilter = n => ( n.type.toLowerCase() === 'dayperiod' );
@@ -345,8 +346,6 @@ export default class DateTime {
 
 			let reMeridiem : RegExp = new RegExp(`${am}|${pm}`, 'g' );
 			prefer12h = reMeridiem.test( amDate.toLocaleTimeString( DateTime.getLocale() ) );
-		} catch ( error ) {
-			throw new Error( error );
 		}
 
 		const meridiemLocaleObject : MeridiemLocaleType = { am, pm, prefer12h };

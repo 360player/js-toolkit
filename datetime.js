@@ -290,11 +290,12 @@ var DateTime = function () {
 	}, {
 		key: 'aggregateMeridiemLocaleObject',
 		value: function aggregateMeridiemLocaleObject() {
-			var am = 'AM';
-			var pm = 'PM';
-			var prefer12h = true;
+			var am = 'am';
+			var pm = 'pm';
+			var prefer12h = false;
 
-			try {
+			// @FLOWFIXME https://github.com/facebook/flow/issues/2801
+			if (typeof Intl.DateTimeFormat.prototype.formatToParts === 'function') {
 				// @FLOWFIXME https://github.com/facebook/flow/issues/2801
 				var formatter = new Intl.DateTimeFormat(DateTime.getLocale(), { hour: 'numeric', hour12: true });
 				var dayPeriodFilter = function dayPeriodFilter(n) {
@@ -309,8 +310,6 @@ var DateTime = function () {
 
 				var reMeridiem = new RegExp(am + '|' + pm, 'g');
 				prefer12h = reMeridiem.test(amDate.toLocaleTimeString(DateTime.getLocale()));
-			} catch (error) {
-				throw new Error(error);
 			}
 
 			var meridiemLocaleObject = { am: am, pm: pm, prefer12h: prefer12h };
